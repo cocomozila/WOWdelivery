@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: delivery
+
+# MySQL
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/wowbd
+
+    # DB
+    username: root
+    password: 1234
+
+# Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+# JPA
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
