@@ -1,5 +1,6 @@
 package com.wow.delivery.controller;
 
+import com.wow.delivery.dto.user.UserSigninDTO;
 import com.wow.delivery.dto.user.UserSignupDTO;
 import com.wow.delivery.service.UserService;
 import jakarta.validation.Valid;
@@ -22,5 +23,11 @@ public class UserController {
     public ResponseEntity<HttpStatus> signup(@RequestBody @Valid UserSignupDTO userSignupDTO) {
         userService.signup(userSignupDTO.toEntity());
         return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<HttpStatus> signin(@RequestBody @Valid UserSigninDTO userSigninDTO) {
+        userService.signin(userSigninDTO.getEmail(), userSigninDTO.getPassword());
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }
