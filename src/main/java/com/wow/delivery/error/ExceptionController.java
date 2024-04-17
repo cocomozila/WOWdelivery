@@ -2,6 +2,7 @@ package com.wow.delivery.error;
 
 import com.wow.delivery.error.exception.DuplicateEmailException;
 import com.wow.delivery.error.exception.DuplicatePhoneNumberException;
+import com.wow.delivery.error.exception.InvalidCredentialsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,6 +23,11 @@ public class ExceptionController {
 
     @ExceptionHandler(DuplicatePhoneNumberException.class)
     public ErrorMessage handleDuplicatePhoneNumberException(DuplicatePhoneNumberException e) {
+        return new ErrorMessage(e.getLocalizedMessage(), getSimpleName(e));
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ErrorMessage handleInvalidCredentialsException(InvalidCredentialsException e) {
         return new ErrorMessage(e.getLocalizedMessage(), getSimpleName(e));
     }
 }
