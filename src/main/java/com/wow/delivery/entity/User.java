@@ -21,12 +21,16 @@ public class User extends BaseEntity {
     private String password;
 
     @Column(nullable = false)
+    private String salt;
+
+    @Column(nullable = false)
     private String phoneNumber;
 
     @Builder
-    public User(String email, String password, String phoneNumber) {
+    public User(String email, String password, String salt, String phoneNumber) {
         this.email = email;
         this.password = password;
+        this.salt = salt;
         this.phoneNumber = phoneNumber;
     }
 }
