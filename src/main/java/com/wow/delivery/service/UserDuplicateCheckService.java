@@ -1,8 +1,8 @@
 package com.wow.delivery.service;
 
 import com.wow.delivery.entity.User;
-import com.wow.delivery.error.exception.DuplicateEmailException;
-import com.wow.delivery.error.exception.DuplicatePhoneNumberException;
+import com.wow.delivery.error.exception.DuplicateException;
+import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,10 +15,10 @@ public class UserDuplicateCheckService {
 
     public void isDuplicateUser(User user) {
         if (isDuplicateEmail(user.getEmail())) {
-            throw new DuplicateEmailException("이미 존재하는 이메일 입니다.");
+            throw new DuplicateException(ErrorCode.DUPLICATE_EMAIL);
         }
         if (isDuplicatePhoneNumber(user.getPhoneNumber())) {
-            throw new DuplicatePhoneNumberException("이미 존재하는 휴대폰 번호 입니다.");
+            throw new DuplicateException(ErrorCode.DUPLICATE_PHONE_NUMBER);
         }
     }
 
