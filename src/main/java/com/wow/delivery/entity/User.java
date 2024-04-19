@@ -5,26 +5,29 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(uniqueConstraints = { @UniqueConstraint(name = "email_phoneNumber_unique", columnNames = { "email", "phoneNumber" }) })
 public class User extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+    @Column(name = "email", columnDefinition = "VARCHAR(30)", nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password", columnDefinition = "VARCHAR(100)", nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "salt", columnDefinition = "VARCHAR(100)", nullable = false)
     private String salt;
 
-    @Column(nullable = false)
+    @Column(name = "phoneNumber", columnDefinition = "VARCHAR(20)", nullable = false)
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "user")
+    private List<Address> addresses = new ArrayList<>();
 
     @Builder
     public User(String email, String password, String salt, String phoneNumber) {

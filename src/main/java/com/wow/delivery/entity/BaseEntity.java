@@ -1,7 +1,6 @@
 package com.wow.delivery.entity;
 
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -14,9 +13,14 @@ import java.time.Instant;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @CreatedDate
+    @Column(name = "date_created", columnDefinition = "DATETIME(6)", nullable = false)
     private Instant dateCreated;
 
     @LastModifiedDate
+    @Column(name = "date_updated", columnDefinition = "DATETIME(6)", nullable = false)
     private Instant dateUpdated;
 }
