@@ -4,9 +4,9 @@ import com.wow.delivery.error.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class DuplicateException extends CustomException {
+public class DataNotFoundException extends CustomException {
 
-    public DuplicateException(ErrorCode errorCode) {
+    public DataNotFoundException(ErrorCode errorCode) {
         super(errorCode);
     }
 }

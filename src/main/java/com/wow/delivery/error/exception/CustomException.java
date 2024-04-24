@@ -3,14 +3,12 @@ package com.wow.delivery.error.exception;
 import com.wow.delivery.error.ErrorCode;
 import lombok.Getter;
 
-import java.security.InvalidParameterException;
-
 @Getter
-public class MismatchException extends InvalidParameterException {
+public class CustomException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public MismatchException(final ErrorCode errorCode) {
+    public CustomException(final ErrorCode errorCode) {
         this.errorCode = errorCode;
     }
 }
