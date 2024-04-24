@@ -3,7 +3,7 @@ package com.wow.delivery.service;
 import com.wow.delivery.entity.User;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.DuplicateException;
-import com.wow.delivery.error.exception.MismatchException;
+import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.repository.UserRepository;
 import com.wow.delivery.util.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class UserService {
         User findUser = userRepository.getUserByEmail(email);
 
         if (!PasswordEncoder.matchesPassword(password, findUser.getPassword(), findUser.getSalt())) {
-            throw new MismatchException(ErrorCode.MISMATCH_ACCOUNT);
+            throw new DataNotFoundException(ErrorCode.MISMATCH_ACCOUNT);
         }
     }
 
