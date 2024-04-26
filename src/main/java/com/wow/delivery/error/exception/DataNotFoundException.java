@@ -9,4 +9,8 @@ public class DataNotFoundException extends CustomException {
     public DataNotFoundException(ErrorCode errorCode) {
         super(errorCode);
     }
+
+    public static boolean instanceOfNotFound(RuntimeException e) {
+        return e.getClass().getSimpleName().equals("DataNotFoundException");
+    }
 }
