@@ -3,13 +3,12 @@ package com.wow.delivery.service;
 import com.wow.delivery.entity.User;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.DataNotFoundException;
+import com.wow.delivery.error.exception.InvalidParameterException;
 import com.wow.delivery.repository.UserRepository;
 import com.wow.delivery.util.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.InvalidParameterException;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +22,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void signin(String email, String password) {
         User findUser = userRepository.getUserByEmail(email);
 
@@ -34,10 +33,10 @@ public class UserService {
 
     private void validDuplicateUser(User user) {
         if (isDuplicateEmail(user.getEmail())) {
-            throw new InvalidParameterException(ErrorCode.DUPLICATE_EMAIL.getMessage());
+            throw new InvalidParameterException(ErrorCode.DUPLICATE_EMAIL);
         }
         if (isDuplicatePhoneNumber(user.getPhoneNumber())) {
-            throw new InvalidParameterException(ErrorCode.DUPLICATE_PHONE_NUMBER.getMessage());
+            throw new InvalidParameterException(ErrorCode.DUPLICATE_PHONE_NUMBER);
         }
     }
 
