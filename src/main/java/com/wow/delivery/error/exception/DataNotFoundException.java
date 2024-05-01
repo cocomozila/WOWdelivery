@@ -11,6 +11,6 @@ public class DataNotFoundException extends CustomException {
     }
 
     public static boolean isInstanceOf(RuntimeException e) {
-        return e.getClass().getSimpleName().equals("DataNotFoundException");
+        return e instanceof DataNotFoundException;
     }
 }
