@@ -1,6 +1,7 @@
 package com.wow.delivery.error;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wow.delivery.error.exception.CustomException;
 import lombok.Getter;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -19,12 +20,17 @@ public class ErrorResponse {
     private List<BindingError> bindingErrors;
 
     private ErrorResponse(RuntimeException e) {
-        this.code = e.getClass().getSimpleName();
-        this.message = e.getMessage();
+        if (e instanceof CustomException customException) {
+            this.code = customException.getErrorCode().name();
+            this.message = customException.getErrorCode().getMessage();
+        } else {
+            this.code = e.getClass().getSimpleName();
+            this.message = e.getMessage();
+        }
     }
 
     private ErrorResponse(MethodArgumentNotValidException e, ErrorCode errorCode) {
-        this.code = e.getClass().getSimpleName();
+        this.code = errorCode.name();
         this.message = errorCode.getMessage();
         this.bindingErrors = BindingError.of(e.getBindingResult());
     }
