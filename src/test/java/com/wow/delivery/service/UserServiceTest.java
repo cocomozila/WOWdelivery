@@ -129,4 +129,22 @@ class UserServiceTest {
         Assertions.assertThrows(DataNotFoundException.class,
             () -> userService.signin(signupUser.getEmail(), "87654321", session));
     }
+
+    @Test
+    @DisplayName("로그아웃 성공")
+    void logoutSuccessTest() {
+        UserSignupDTO signupUser = UserSignupDTO.builder()
+            .email("test@gmail.com")
+            .password("12345678")
+            .phoneNumber("01011111111")
+            .build();
+        userService.signup(signupUser.toEntity());
+
+        HttpSession session = new MockHttpSession();
+        userService.signin(signupUser.getEmail(), signupUser.getPassword(), session);
+        userService.logout(session);
+        Assertions.assertThrows(IllegalStateException.class,
+            () -> session.getAttribute(signupUser.getEmail()));
+
+    }
 }
