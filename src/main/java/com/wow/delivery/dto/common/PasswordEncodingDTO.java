@@ -1,4 +1,4 @@
-package com.wow.delivery.dto.user;
+package com.wow.delivery.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
