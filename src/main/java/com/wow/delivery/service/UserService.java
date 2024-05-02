@@ -6,6 +6,7 @@ import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.InvalidParameterException;
 import com.wow.delivery.repository.UserRepository;
 import com.wow.delivery.util.PasswordEncoder;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +24,18 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public void signin(String email, String password) {
+    public void signin(String email, String password, HttpSession session) {
         User findUser = userRepository.getUserByEmail(email);
 
         if (!PasswordEncoder.matchesPassword(password, findUser.getPassword(), findUser.getSalt())) {
             throw new DataNotFoundException(ErrorCode.MISMATCH_ACCOUNT);
         }
+        setSession(findUser, session);
+    }
+
+    private void setSession(User user, HttpSession session) {
+        session.setAttribute("userEmail", user.getEmail());
+        session.setMaxInactiveInterval(60 * 30);
     }
 
     private void validDuplicateUser(User user) {
