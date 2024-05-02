@@ -3,6 +3,7 @@ package com.wow.delivery.controller;
 import com.wow.delivery.dto.user.UserSigninDTO;
 import com.wow.delivery.dto.user.UserSignupDTO;
 import com.wow.delivery.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,8 +27,8 @@ public class UserController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<HttpStatus> signin(@RequestBody @Valid UserSigninDTO userSigninDTO) {
-        userService.signin(userSigninDTO.getEmail(), userSigninDTO.getPassword());
+    public ResponseEntity<HttpStatus> signin(@RequestBody @Valid UserSigninDTO userSigninDTO, HttpSession session) {
+        userService.signin(userSigninDTO.getEmail(), userSigninDTO.getPassword(), session);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }
