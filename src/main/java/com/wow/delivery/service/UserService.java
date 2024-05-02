@@ -33,6 +33,10 @@ public class UserService {
         setSession(findUser, session);
     }
 
+    public void logout(HttpSession session) {
+        session.invalidate();
+    }
+
     private void setSession(User user, HttpSession session) {
         session.setAttribute("userEmail", user.getEmail());
         session.setMaxInactiveInterval(60 * 30);
