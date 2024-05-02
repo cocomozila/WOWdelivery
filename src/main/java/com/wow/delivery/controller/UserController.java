@@ -31,4 +31,9 @@ public class UserController {
         userService.signin(userSigninDTO.getEmail(), userSigninDTO.getPassword(), session);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+
+    @PostMapping("/logout")
+    public void logout(HttpSession session) {
+        userService.logout(session);
+    }
 }
