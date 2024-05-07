@@ -25,10 +25,10 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public void signin(String email, String password, HttpSession session) {
-        User findUser = userRepository.getUserByEmail(email);
+        User findUser = userRepository.getByEmail(email);
 
         if (!PasswordEncoder.matchesPassword(password, findUser.getPassword(), findUser.getSalt())) {
-            throw new DataNotFoundException(ErrorCode.MISMATCH_ACCOUNT);
+            throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
         setSession(findUser, session);
     }
@@ -44,10 +44,10 @@ public class UserService {
 
     private void validDuplicateUser(User user) {
         if (isDuplicateEmail(user.getEmail())) {
-            throw new InvalidParameterException(ErrorCode.DUPLICATE_EMAIL);
+            throw new InvalidParameterException(ErrorCode.DUPLICATE_DATA, "중복된 이메일 입니다.");
         }
         if (isDuplicatePhoneNumber(user.getPhoneNumber())) {
-            throw new InvalidParameterException(ErrorCode.DUPLICATE_PHONE_NUMBER);
+            throw new InvalidParameterException(ErrorCode.DUPLICATE_DATA, "중복된 휴대폰 번호 입니다.");
         }
     }
 
