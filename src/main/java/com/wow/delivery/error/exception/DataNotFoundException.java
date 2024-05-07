@@ -6,11 +6,7 @@ import lombok.Getter;
 @Getter
 public class DataNotFoundException extends CustomException {
 
-    public DataNotFoundException(ErrorCode errorCode) {
-        super(errorCode);
-    }
-
-    public static boolean isInstanceOf(RuntimeException e) {
-        return e instanceof DataNotFoundException;
+    public DataNotFoundException(ErrorCode errorCode, String message) {
+        super(errorCode, message);
     }
 }
