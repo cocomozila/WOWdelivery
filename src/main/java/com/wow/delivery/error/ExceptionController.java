@@ -19,12 +19,12 @@ public class ExceptionController {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
-        if (DataNotFoundException.isInstanceOf(e)) {
+        if (e instanceof DataNotFoundException) {
             return new ResponseEntity<>(ErrorResponse.of(e), HttpStatus.NOT_FOUND);
         }
-        if (InvalidParameterException.isInstanceOf(e)) {
+        if (e instanceof InvalidParameterException) {
             return new ResponseEntity<>(ErrorResponse.of(e), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(ErrorResponse.of(e), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorResponse.of(e), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
