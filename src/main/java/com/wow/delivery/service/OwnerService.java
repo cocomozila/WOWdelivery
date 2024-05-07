@@ -25,10 +25,10 @@ public class OwnerService {
 
     @Transactional(readOnly = true)
     public void signin(String email, String password, HttpSession session) {
-        Owner findOwner = ownerRepository.getOwnerByEmail(email);
+        Owner findOwner = ownerRepository.getByEmail(email);
 
         if (!PasswordEncoder.matchesPassword(password, findOwner.getPassword(), findOwner.getSalt())) {
-            throw new DataNotFoundException(ErrorCode.MISMATCH_ACCOUNT);
+            throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
         setSession(findOwner, session);
     }
@@ -44,10 +44,10 @@ public class OwnerService {
 
     private void validDuplicateUser(Owner owner) {
         if (isDuplicateEmail(owner.getEmail())) {
-            throw new InvalidParameterException(ErrorCode.DUPLICATE_EMAIL);
+            throw new InvalidParameterException(ErrorCode.DUPLICATE_DATA, "중복된 이메일 입니다.");
         }
         if (isDuplicatePhoneNumber(owner.getPhoneNumber())) {
-            throw new InvalidParameterException(ErrorCode.DUPLICATE_PHONE_NUMBER);
+            throw new InvalidParameterException(ErrorCode.DUPLICATE_DATA, "중복된 휴대폰 번호 입니다.");
         }
     }
 
