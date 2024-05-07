@@ -22,7 +22,7 @@ public class ErrorResponse {
     private ErrorResponse(RuntimeException e) {
         if (e instanceof CustomException customException) {
             this.code = customException.getErrorCode().name();
-            this.message = customException.getErrorCode().getMessage();
+            this.message = e.getMessage();
         } else {
             this.code = e.getClass().getSimpleName();
             this.message = e.getMessage();
