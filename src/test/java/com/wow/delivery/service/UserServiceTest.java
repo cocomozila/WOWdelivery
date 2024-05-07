@@ -6,145 +6,196 @@ import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.InvalidParameterException;
 import com.wow.delivery.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@Transactional
-class UserServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest {
 
-    @Autowired
+    @InjectMocks
     private UserService userService;
 
-    @Autowired
+    @Spy
     private UserRepository userRepository;
 
-    @AfterEach
-    void after() {
-        userRepository.deleteAll();
+    @Nested
+    @DisplayName("회원가입")
+    class Signup {
+
+        @Test
+        @DisplayName("성공")
+        void signupSuccessTest() {
+            // given
+            User signupUser = UserSignupDTO.builder()
+                .email("test@gmail.com")
+                .password("12345678")
+                .phoneNumber("01011111111")
+                .build()
+                .toEntity();
+
+            given(userRepository.existsByEmail(any()))
+                .willReturn(false);
+            given(userRepository.existsByPhoneNumber(any()))
+                .willReturn(false);
+
+            // when
+            userService.signup(signupUser);
+
+            // then
+            then(userRepository)
+                .should(times(1))
+                .save(any());
+        }
+
+        @Test
+        @DisplayName("실패 - 중복된 이메일")
+        void signupFailTest_DuplicateEmail() {
+            // given
+            User signupUser = UserSignupDTO.builder()
+                .email("test@gmail.com")
+                .password("12345678")
+                .phoneNumber("01011111111")
+                .build()
+                .toEntity();
+
+            given(userRepository.existsByEmail(any()))
+                .willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> userService.signup(signupUser))
+                .isInstanceOf(InvalidParameterException.class)
+                .hasMessage("중복된 이메일 입니다.");
+        }
+
+        @Test
+        @DisplayName("실패 - 중복된 휴대폰 번호")
+        void signupFailTest_DuplicatePhoneNumber() {
+            // given
+            User signupUser = UserSignupDTO.builder()
+                .email("test@gmail.com")
+                .password("12345678")
+                .phoneNumber("01011111111")
+                .build()
+                .toEntity();
+
+            given(userRepository.existsByEmail(any()))
+                .willReturn(false);
+            given(userRepository.existsByPhoneNumber(any()))
+                .willReturn(true);
+
+            // when & then
+            assertThrows(InvalidParameterException.class,
+                () -> userService.signup(signupUser));
+        }
     }
 
-    @Test
-    @DisplayName("회원가입 성공")
-    void signupSuccessTest() {
-        User signupUser = UserSignupDTO.builder()
-            .email("test@gmail.com")
-            .password("12345678")
-            .phoneNumber("01011111111")
-            .build().toEntity();
+    @Nested
+    @DisplayName("로그인")
+    class Signin {
 
-        userService.signup(signupUser);
-        User findByUser = userRepository.getUserByEmail(signupUser.getEmail());
-        assertThat(findByUser.getId()).isNotNull();
-    }
+        @Test
+        @DisplayName("성공 - 세션에 이메일 등록")
+        void signinSuccessTest() {
+            // given
+            UserSignupDTO signupUser = UserSignupDTO.builder()
+                .email("test@gmail.com")
+                .password("12345678")
+                .phoneNumber("01011111111")
+                .build();
 
-    @Test
-    @DisplayName("회원가입 실패 - 중복된 이메일")
-    void signupFailTest_DuplicateEmail() {
-        User signupUser = UserSignupDTO.builder()
-            .email("test@gmail.com")
-            .password("12345678")
-            .phoneNumber("01011111111")
-            .build().toEntity();
+            User user = signupUser.toEntity();
+            HttpSession session = mock(HttpSession.class);
 
-        userService.signup(signupUser);
+            given(userRepository.findUserByEmail(signupUser.getEmail()))
+                .willReturn(Optional.of(user));
 
-        User duplicateEmailSignupUser = UserSignupDTO.builder()
-            .email("test@gmail.com")
-            .password("12345678")
-            .phoneNumber("01011113333")
-            .build().toEntity();
+            doNothing()
+                .when(session)
+                .setAttribute("userEmail", signupUser.getEmail());
 
-        Assertions.assertThrows(InvalidParameterException.class,
-            () -> userService.signup(duplicateEmailSignupUser));
-    }
+            // when
+            userService.signin(signupUser.getEmail(), signupUser.getPassword(), session);
 
-    @Test
-    @DisplayName("회원가입 실패 - 중복된 휴대폰 번호")
-    void signupFailTest_DuplicatePhoneNumber() {
-        User signupUser = UserSignupDTO.builder()
-            .email("test@gmail.com")
-            .password("12345678")
-            .phoneNumber("01011111111")
-            .build().toEntity();
+            // then
+            then(session)
+                .should(times(1))
+                .setAttribute("userEmail", signupUser.getEmail());
+        }
 
-        userService.signup(signupUser);
+        @Test
+        @DisplayName("실패 - 일치하지 않는 이메일")
+        void signinFailTest_invalidEmail() {
+            // given
+            UserSignupDTO signupUser = UserSignupDTO.builder()
+                .email("test@gmail.com")
+                .password("12345678")
+                .phoneNumber("01011111111")
+                .build();
 
-        User duplicatePhoneNumberSignupUser = UserSignupDTO.builder()
-            .email("basic@gmail.com")
-            .password("12345678")
-            .phoneNumber("01011111111")
-            .build().toEntity();
+            String wrongSigninEmail = "wrong@gmail.com";
+            HttpSession session = mock(HttpSession.class);
 
-        Assertions.assertThrows(InvalidParameterException.class,
-            () -> userService.signup(duplicatePhoneNumberSignupUser));
-    }
+            given(userRepository.findUserByEmail(any()))
+                .willReturn(Optional.empty());
 
-    @Test
-    @DisplayName("로그인 성공 - 세션에 이메일 등록")
-    void signinSuccessTest() {
-        UserSignupDTO signupUser = UserSignupDTO.builder()
-            .email("test@gmail.com")
-            .password("12345678")
-            .phoneNumber("01011111111")
-            .build();
-        userService.signup(signupUser.toEntity());
+            // when & then
+            assertThatThrownBy(() -> userService.signin(wrongSigninEmail, signupUser.getPassword(), session))
+                .isInstanceOf(DataNotFoundException.class)
+                .hasMessage("일치하는 계정을 찾을 수 없습니다.");
+        }
 
-        HttpSession session = new MockHttpSession();
-        userService.signin(signupUser.getEmail(), signupUser.getPassword(), session);
-        assertThat(session.getAttribute("userEmail")).isEqualTo(signupUser.getEmail());
-    }
+        @Test
+        @DisplayName("실패 - 일치하지 않는 패스워드")
+        void signinFailTest_invalidPassword() {
+            // given
+            UserSignupDTO signupUser = UserSignupDTO.builder()
+                .email("test@gmail.com")
+                .password("12345678")
+                .phoneNumber("01011111111")
+                .build();
 
-    @Test
-    @DisplayName("로그인 실패 - 일치하지 않는 이메일")
-    void signinFailTest_invalidEmail() {
-        UserSignupDTO signupUser = UserSignupDTO.builder()
-            .email("test@gmail.com")
-            .password("12345678")
-            .phoneNumber("01011111111")
-            .build();
-        userService.signup(signupUser.toEntity());
+            String wrongPassword = "wrongwrong";
 
-        HttpSession session = new MockHttpSession();
-        Assertions.assertThrows(DataNotFoundException.class,
-            () -> userService.signin("fail@gmail.com", signupUser.getPassword(), session));
-    }
+            User user = signupUser.toEntity();
+            HttpSession session = mock(HttpSession.class);
 
-    @Test
-    @DisplayName("로그인 실패 - 일치하지 않는 패스워드")
-    void signinFailTest_invalidPassword() {
-        UserSignupDTO signupUser = UserSignupDTO.builder()
-            .email("test@gmail.com")
-            .password("12345678")
-            .phoneNumber("01011111111")
-            .build();
-        userService.signup(signupUser.toEntity());
+            given(userRepository.findUserByEmail(signupUser.getEmail()))
+                .willReturn(Optional.of(user));
 
-        HttpSession session = new MockHttpSession();
-        Assertions.assertThrows(DataNotFoundException.class,
-            () -> userService.signin(signupUser.getEmail(), "87654321", session));
-    }
+            // when & then
+            assertThatThrownBy(() -> userService.signin(signupUser.getEmail(), wrongPassword, session))
+                .isInstanceOf(DataNotFoundException.class)
+                .hasMessage("일치하는 계정을 찾을 수 없습니다.");
+        }
 
-    @Test
-    @DisplayName("로그아웃 성공")
-    void logoutSuccessTest() {
-        UserSignupDTO signupUser = UserSignupDTO.builder()
-            .email("test@gmail.com")
-            .password("12345678")
-            .phoneNumber("01011111111")
-            .build();
-        userService.signup(signupUser.toEntity());
+        @Test
+        @DisplayName("로그아웃 성공")
+        void logoutSuccessTest() {
+            // given
+            HttpSession session = spy(HttpSession.class);
+            session.setAttribute("userEmail", "test@gmail.com");
 
-        HttpSession session = new MockHttpSession();
-        userService.signin(signupUser.getEmail(), signupUser.getPassword(), session);
-        userService.logout(session);
-        Assertions.assertThrows(IllegalStateException.class,
-            () -> session.getAttribute(signupUser.getEmail()));
+            // when
+            userService.logout(session);
 
+            // then
+            then(session).should(times(1)).invalidate();
+            assertThat(session.getAttribute("userEmail")).isNull();
+        }
     }
 }
