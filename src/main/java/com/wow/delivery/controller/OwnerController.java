@@ -1,8 +1,8 @@
 package com.wow.delivery.controller;
 
-import com.wow.delivery.dto.user.UserSigninDTO;
-import com.wow.delivery.dto.user.UserSignupDTO;
-import com.wow.delivery.service.UserService;
+import com.wow.delivery.dto.owner.OwnerSigninDTO;
+import com.wow.delivery.dto.owner.OwnerSignupDTO;
+import com.wow.delivery.service.OwnerService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,26 +14,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/owner")
 @RequiredArgsConstructor
-public class UserController {
+public class OwnerController {
 
-    private final UserService userService;
+    private final OwnerService ownerService;
 
     @PostMapping("/signup")
-    public ResponseEntity<HttpStatus> signup(@RequestBody @Valid UserSignupDTO userSignupDTO) {
-        userService.signup(userSignupDTO.toEntity());
+    public ResponseEntity<HttpStatus> signup(@RequestBody @Valid OwnerSignupDTO ownerSignupDTO) {
+        ownerService.signup(ownerSignupDTO.toEntity());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<HttpStatus> signin(@RequestBody @Valid UserSigninDTO userSigninDTO, HttpSession session) {
-        userService.signin(userSigninDTO.getEmail(), userSigninDTO.getPassword(), session);
+    public ResponseEntity<HttpStatus> signin(@RequestBody @Valid OwnerSigninDTO ownerSigninDTO, HttpSession session) {
+        ownerService.signin(ownerSigninDTO.getEmail(), ownerSigninDTO.getPassword(), session);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PostMapping("/logout")
     public void logout(HttpSession session) {
-        userService.logout(session);
+        ownerService.logout(session);
     }
 }

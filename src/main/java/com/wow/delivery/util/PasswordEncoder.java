@@ -1,6 +1,6 @@
 package com.wow.delivery.util;
 
-import com.wow.delivery.dto.user.PasswordEncodingDTO;
+import com.wow.delivery.dto.common.PasswordEncodingDTO;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

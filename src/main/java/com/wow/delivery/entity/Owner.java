@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Table(uniqueConstraints = { @UniqueConstraint(name = "email_phoneNumber_unique", columnNames = { "email", "phone_number" }) })
-public class User extends BaseEntity {
+public class Owner extends BaseEntity {
 
     @Column(name = "email", columnDefinition = "VARCHAR(30)", nullable = false)
     private String email;
@@ -27,7 +27,7 @@ public class User extends BaseEntity {
     private String phoneNumber;
 
     @Builder
-    public User(String email, String password, String salt, String phoneNumber) {
+    public Owner(String email, String password, String salt, String phoneNumber) {
         this.email = email;
         this.password = password;
         this.salt = salt;
