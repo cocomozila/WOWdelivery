@@ -1,8 +1,5 @@
 package com.wow.delivery.dto.user;
 
-import com.wow.delivery.dto.common.PasswordEncodingDTO;
-import com.wow.delivery.entity.User;
-import com.wow.delivery.util.PasswordEncoder;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -34,14 +31,4 @@ public class UserSignupDTO {
         this.password = password;
         this.phoneNumber = phoneNumber;
     }
-
-    public User toEntity() {
-        PasswordEncodingDTO passwordEncoder = PasswordEncoder.encodePassword(this.password);
-        return User.builder().email(this.email)
-                .password(passwordEncoder.getEncodePassword())
-                .salt(passwordEncoder.getSalt())
-                .phoneNumber(this.phoneNumber)
-                .build();
-    }
-
 }
