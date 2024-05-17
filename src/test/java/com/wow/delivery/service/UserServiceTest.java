@@ -83,7 +83,6 @@ public class UserServiceTest {
             given(userRepository.existsByEmail(any()))
                 .willReturn(true);
 
-
             // when & then
             assertThrows(InvalidParameterException.class,
                 () -> userService.signup(signupUser));
