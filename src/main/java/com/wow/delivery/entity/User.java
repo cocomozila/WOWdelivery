@@ -8,11 +8,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(uniqueConstraints = { @UniqueConstraint(name = "email_phoneNumber_unique", columnNames = { "email", "phone_number" }) })
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable {
 
     @Column(name = "email", columnDefinition = "VARCHAR(30)", nullable = false)
     private String email;
