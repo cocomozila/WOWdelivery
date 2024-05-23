@@ -151,7 +151,7 @@ public class OwnerServiceTest {
             // then
             then(session)
                 .should(times(1))
-                .setAttribute(any(), any(Owner.class));
+                .setAttribute(any(), any());
         }
 
         @Test

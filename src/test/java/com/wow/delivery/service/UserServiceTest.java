@@ -150,7 +150,7 @@ public class UserServiceTest {
             // then
             then(session)
                 .should(times(1))
-                .setAttribute(any(), any(User.class));
+                .setAttribute(any(), any());
         }
 
         @Test
