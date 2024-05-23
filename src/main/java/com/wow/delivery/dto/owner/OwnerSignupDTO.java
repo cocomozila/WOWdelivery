@@ -1,8 +1,5 @@
 package com.wow.delivery.dto.owner;
 
-import com.wow.delivery.dto.common.PasswordEncodingDTO;
-import com.wow.delivery.entity.Owner;
-import com.wow.delivery.util.PasswordEncoder;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -33,14 +30,5 @@ public class OwnerSignupDTO {
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
-    }
-
-    public Owner toEntity() {
-        PasswordEncodingDTO passwordEncoder = PasswordEncoder.encodePassword(this.password);
-        return Owner.builder().email(this.email)
-            .password(passwordEncoder.getEncodePassword())
-            .salt(passwordEncoder.getSalt())
-            .phoneNumber(this.phoneNumber)
-            .build();
     }
 }
