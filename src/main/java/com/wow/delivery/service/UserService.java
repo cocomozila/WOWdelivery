@@ -42,15 +42,15 @@ public class UserService {
         if (!PasswordEncoder.matchesPassword(userSigninDTO.getPassword(), findUser.getPassword(), findUser.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
-        setSession(findUser, session);
+        setSession(findUser.getId() , session);
     }
 
     public void logout(HttpSession session) {
         session.invalidate();
     }
 
-    private void setSession(User user, HttpSession session) {
-        session.setAttribute(UUID.randomUUID().toString(), user);
+    private void setSession(Long id, HttpSession session) {
+        session.setAttribute(UUID.randomUUID().toString(), id);
         session.setMaxInactiveInterval(60 * 30);
     }
 

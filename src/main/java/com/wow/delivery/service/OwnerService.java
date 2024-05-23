@@ -42,15 +42,15 @@ public class OwnerService {
         if (!PasswordEncoder.matchesPassword(ownerSigninDTO.getPassword(), findOwner.getPassword(), findOwner.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
-        setSession(findOwner, session);
+        setSession(findOwner.getId(), session);
     }
 
     public void logout(HttpSession session) {
         session.invalidate();
     }
 
-    private void setSession(Owner owner, HttpSession session) {
-        session.setAttribute(UUID.randomUUID().toString(), owner);
+    private void setSession(Long id, HttpSession session) {
+        session.setAttribute(UUID.randomUUID().toString(), id);
         session.setMaxInactiveInterval(60 * 30);
     }
 
