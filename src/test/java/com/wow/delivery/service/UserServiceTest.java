@@ -19,6 +19,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -209,15 +210,31 @@ public class UserServiceTest {
         @DisplayName("로그아웃 성공")
         void logoutSuccessTest() {
             // given
+            String password = "12345678";
+
+            PasswordEncodingDTO passwordEncoder =
+                PasswordEncoder.encodePassword(password);
+
+            User user = User.builder()
+                .email("seyun@gmail.com")
+                .password(passwordEncoder.getEncodePassword())
+                .salt(passwordEncoder.getSalt())
+                .phoneNumber("01044445555")
+                .build();
+
+            String uuid = UUID.randomUUID().toString();
             HttpSession session = spy(HttpSession.class);
-            session.setAttribute("userEmail", "test@gmail.com");
+            session.setAttribute(uuid, user);
 
             // when
             userService.logout(session);
 
             // then
-            then(session).should(times(1)).invalidate();
-            assertThat(session.getAttribute("userEmail")).isNull();
+            then(session)
+                .should(times(1))
+                .invalidate();
+            assertThat(session.getAttribute(uuid))
+                .isNull();
         }
     }
 }
