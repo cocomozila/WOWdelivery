@@ -51,6 +51,7 @@ public class UserService {
 
     private void setSession(User user, HttpSession session) {
         session.setAttribute(UUID.randomUUID().toString(), user);
+        session.setMaxInactiveInterval(60 * 30);
     }
 
     private void validDuplicateUser(UserSignupDTO userSignupDTO) {
