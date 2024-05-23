@@ -4,7 +4,7 @@ import com.wow.delivery.entity.User;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.DataNotFoundException;
 
-public interface UserRepository extends CustomJpaRepository<User, Long> {
+import java.util.Optional;
 
 public interface UserRepository extends CustomJpaRepository<User, Long> {
 
