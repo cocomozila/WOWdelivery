@@ -22,13 +22,13 @@ public class OwnerController {
 
     @PostMapping("/signup")
     public ResponseEntity<HttpStatus> signup(@RequestBody @Valid OwnerSignupDTO ownerSignupDTO) {
-        ownerService.signup(ownerSignupDTO.toEntity());
+        ownerService.signup(ownerSignupDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/signin")
     public ResponseEntity<HttpStatus> signin(@RequestBody @Valid OwnerSigninDTO ownerSigninDTO, HttpSession session) {
-        ownerService.signin(ownerSigninDTO.getEmail(), ownerSigninDTO.getPassword(), session);
+        ownerService.signin(ownerSigninDTO, session);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
