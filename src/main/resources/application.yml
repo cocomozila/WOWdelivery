@@ -22,12 +22,13 @@ spring:
       hibernate:
         format_sql: true
 
-# Redis
-#  redis:
-#    profiles:
-#      active: local
   data:
     redis:
       host: localhost
       port: 6379
       password: '1234'
+
+session:
+  store-type: redis
+  redis:
+    namespace: shboard:session
