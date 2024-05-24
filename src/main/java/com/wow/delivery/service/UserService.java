@@ -38,11 +38,11 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public void signin(UserSigninDTO userSigninDTO, HttpSession session) {
-        User findUser = userRepository.getByEmail(userSigninDTO.getEmail());
-        if (!PasswordEncoder.matchesPassword(userSigninDTO.getPassword(), findUser.getPassword(), findUser.getSalt())) {
+        User user = userRepository.getByEmail(userSigninDTO.getEmail());
+        if (!PasswordEncoder.matchesPassword(userSigninDTO.getPassword(), user.getPassword(), user.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
-        setSession(findUser.getId() , session);
+        setSession(user.getId() , session);
     }
 
     public void logout(HttpSession session) {
