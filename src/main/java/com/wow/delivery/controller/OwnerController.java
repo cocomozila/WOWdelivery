@@ -1,6 +1,7 @@
 package com.wow.delivery.controller;
 
 import com.wow.delivery.dto.owner.OwnerSigninDTO;
+import com.wow.delivery.dto.owner.OwnerSigninResponse;
 import com.wow.delivery.dto.owner.OwnerSignupDTO;
 import com.wow.delivery.service.OwnerService;
 import jakarta.servlet.http.HttpSession;
@@ -27,9 +28,9 @@ public class OwnerController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<HttpStatus> signin(@RequestBody @Valid OwnerSigninDTO ownerSigninDTO, HttpSession session) {
-        ownerService.signin(ownerSigninDTO, session);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public ResponseEntity<OwnerSigninResponse> signin(@RequestBody @Valid OwnerSigninDTO ownerSigninDTO, HttpSession session) {
+        OwnerSigninResponse ownerSigninResponse = ownerService.signin(ownerSigninDTO, session);
+        return ResponseEntity.ok(ownerSigninResponse);
     }
 
     @PostMapping("/logout")

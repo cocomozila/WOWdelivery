@@ -1,6 +1,7 @@
 package com.wow.delivery.controller;
 
 import com.wow.delivery.dto.user.UserSigninDTO;
+import com.wow.delivery.dto.user.UserSigninResponse;
 import com.wow.delivery.dto.user.UserSignupDTO;
 import com.wow.delivery.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -27,9 +28,9 @@ public class UserController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<HttpStatus> signin(@RequestBody @Valid UserSigninDTO userSigninDTO, HttpSession session) {
-        userService.signin(userSigninDTO, session);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public ResponseEntity<UserSigninResponse> signin(@RequestBody @Valid UserSigninDTO userSigninDTO, HttpSession session) {
+        UserSigninResponse userSigninResponse = userService.signin(userSigninDTO, session);
+        return ResponseEntity.ok(userSigninResponse);
     }
 
     @PostMapping("/logout")

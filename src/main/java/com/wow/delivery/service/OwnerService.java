@@ -2,6 +2,7 @@ package com.wow.delivery.service;
 
 import com.wow.delivery.dto.common.PasswordEncodingDTO;
 import com.wow.delivery.dto.owner.OwnerSigninDTO;
+import com.wow.delivery.dto.owner.OwnerSigninResponse;
 import com.wow.delivery.dto.owner.OwnerSignupDTO;
 import com.wow.delivery.entity.Owner;
 import com.wow.delivery.error.ErrorCode;
@@ -37,12 +38,15 @@ public class OwnerService {
     }
 
     @Transactional(readOnly = true)
-    public void signin(OwnerSigninDTO ownerSigninDTO, HttpSession session) {
-        Owner findOwner = ownerRepository.getByEmail(ownerSigninDTO.getEmail());
-        if (!PasswordEncoder.matchesPassword(ownerSigninDTO.getPassword(), findOwner.getPassword(), findOwner.getSalt())) {
+    public OwnerSigninResponse signin(OwnerSigninDTO ownerSigninDTO, HttpSession session) {
+        Owner owner = ownerRepository.getByEmail(ownerSigninDTO.getEmail());
+        if (!PasswordEncoder.matchesPassword(ownerSigninDTO.getPassword(), owner.getPassword(), owner.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
-        setSession(findOwner.getId(), session);
+        setSession(owner.getId(), session);
+        return OwnerSigninResponse.builder()
+            .id(owner.getId())
+            .build();
     }
 
     public void logout(HttpSession session) {

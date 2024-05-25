@@ -2,6 +2,7 @@ package com.wow.delivery.service;
 
 import com.wow.delivery.dto.common.PasswordEncodingDTO;
 import com.wow.delivery.dto.user.UserSigninDTO;
+import com.wow.delivery.dto.user.UserSigninResponse;
 import com.wow.delivery.dto.user.UserSignupDTO;
 import com.wow.delivery.entity.User;
 import com.wow.delivery.error.ErrorCode;
@@ -37,12 +38,15 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public void signin(UserSigninDTO userSigninDTO, HttpSession session) {
+    public UserSigninResponse signin(UserSigninDTO userSigninDTO, HttpSession session) {
         User user = userRepository.getByEmail(userSigninDTO.getEmail());
         if (!PasswordEncoder.matchesPassword(userSigninDTO.getPassword(), user.getPassword(), user.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
         setSession(user.getId() , session);
+        return UserSigninResponse.builder()
+            .id(user.getId())
+            .build();
     }
 
     public void logout(HttpSession session) {
