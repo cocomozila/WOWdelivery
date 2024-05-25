@@ -12,7 +12,10 @@ public enum ErrorCode {
     DATA_NOT_FOUND("데이터를 찾을 수 없습니다."),
 
     // Parameter
-    INVALID_PARAMETER("유효하지 않은 입력 값입니다.");
+    INVALID_PARAMETER("유효하지 않은 입력 값입니다."),
+
+    // Authentication
+    UNAUTHENTICATED("인증이 필요합니다.");
 
     private final String message;
 

@@ -1,5 +1,9 @@
 package com.wow.delivery.service;
 
+import com.wow.delivery.dto.common.PasswordEncodingDTO;
+import com.wow.delivery.dto.owner.OwnerSigninDTO;
+import com.wow.delivery.dto.owner.OwnerSigninResponse;
+import com.wow.delivery.dto.owner.OwnerSignupDTO;
 import com.wow.delivery.entity.Owner;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.DataNotFoundException;
@@ -11,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class OwnerService {
@@ -18,35 +24,45 @@ public class OwnerService {
     private final OwnerRepository ownerRepository;
 
     @Transactional
-    public void signup(Owner owner) {
-        validDuplicateUser(owner);
+    public void signup(OwnerSignupDTO ownerSignupDTO) {
+        validDuplicateUser(ownerSignupDTO);
+        PasswordEncodingDTO passwordEncoder
+            = PasswordEncoder.encodePassword(ownerSignupDTO.getPassword());
+        Owner owner = Owner.builder()
+                .email(ownerSignupDTO.getEmail())
+                .password(passwordEncoder.getEncodePassword())
+                .salt(passwordEncoder.getSalt())
+                .phoneNumber(ownerSignupDTO.getPhoneNumber())
+                .build();
         ownerRepository.save(owner);
     }
 
     @Transactional(readOnly = true)
-    public void signin(String email, String password, HttpSession session) {
-        Owner findOwner = ownerRepository.getByEmail(email);
-
-        if (!PasswordEncoder.matchesPassword(password, findOwner.getPassword(), findOwner.getSalt())) {
+    public OwnerSigninResponse signin(OwnerSigninDTO ownerSigninDTO, HttpSession session) {
+        Owner owner = ownerRepository.getByEmail(ownerSigninDTO.getEmail());
+        if (!PasswordEncoder.matchesPassword(ownerSigninDTO.getPassword(), owner.getPassword(), owner.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
-        setSession(findOwner, session);
+        setSession(owner.getId(), session);
+        return OwnerSigninResponse.builder()
+            .id(owner.getId())
+            .build();
     }
 
     public void logout(HttpSession session) {
         session.invalidate();
     }
 
-    private void setSession(Owner user, HttpSession session) {
-        session.setAttribute("ownerEmail", user.getEmail());
-        session.setMaxInactiveInterval(60 * 60 * 12);
+    private void setSession(Long id, HttpSession session) {
+        session.setAttribute(UUID.randomUUID().toString(), id);
+        session.setMaxInactiveInterval(60 * 30);
     }
 
-    private void validDuplicateUser(Owner owner) {
-        if (isDuplicateEmail(owner.getEmail())) {
+    private void validDuplicateUser(OwnerSignupDTO ownerSignupDTO) {
+        if (isDuplicateEmail(ownerSignupDTO.getEmail())) {
             throw new InvalidParameterException(ErrorCode.DUPLICATE_DATA, "중복된 이메일 입니다.");
         }
-        if (isDuplicatePhoneNumber(owner.getPhoneNumber())) {
+        if (isDuplicatePhoneNumber(ownerSignupDTO.getPhoneNumber())) {
             throw new InvalidParameterException(ErrorCode.DUPLICATE_DATA, "중복된 휴대폰 번호 입니다.");
         }
     }
