@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @RequiredArgsConstructor
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
@@ -25,6 +26,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (AuthenticationException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE); // charset=UTF-8 왜 없어졌는가
             response.getWriter()
                 .write(objectMapper.writeValueAsString(ErrorResponse.of(e)));
