@@ -1,6 +1,7 @@
 package com.wow.delivery.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,10 +23,27 @@ public class Address extends BaseEntity {
     @Column(name = "detailed_address", columnDefinition = "VARCHAR(30)")
     private String detailedAddress; // 상세주소
 
-    @Column(name = "x_coordinate", columnDefinition = "DOUBLE", nullable = false)
-    private Double xCoordinate; // x좌표
+    @Column(name = "location_x", columnDefinition = "DOUBLE", nullable = false)
+    private Double locationX; // x좌표
 
-    @Column(name = "y_coordinate", columnDefinition = "DOUBLE", nullable = false)
-    private Double yCoordinate; // y좌표
+    @Column(name = "location_y", columnDefinition = "DOUBLE", nullable = false)
+    private Double locationY; // y좌표
 
+    @Builder
+    public Address(User user, String addressAlias, String addressName, String detailedAddress, Double locationX, Double locationY) {
+        this.user = user;
+        this.addressAlias = addressAlias;
+        this.addressName = addressName;
+        this.detailedAddress = detailedAddress;
+        this.locationX = locationX;
+        this.locationY = locationY;
+    }
+
+    public void update(String addressAlias, String addressName, String detailedAddress, Double locationX, Double locationY) {
+        this.addressAlias = addressAlias;
+        this.addressName = addressName;
+        this.detailedAddress = detailedAddress;
+        this.locationX = locationX;
+        this.locationY = locationY;
+    }
 }
