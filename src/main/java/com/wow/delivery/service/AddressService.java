@@ -50,10 +50,4 @@ public class AddressService {
         Address address = addressRepository.getById(addressUpdateDTO.getAddressId());
         address.update(addressUpdateDTO.getAddressAlias(), addressUpdateDTO.getAddressName(), addressUpdateDTO.getDetailedAddress(), addressUpdateDTO.getLocationX(), addressUpdateDTO.getLocationY());
     }
-
-    @Transactional
-    public void deleteAddress(Long addressId) {
-        Address address = addressRepository.getById(addressId);
-
-    }
 }
