@@ -15,7 +15,7 @@ import java.io.IOException;
 public class LoginFilter implements Filter {
 
     private static final String COOKIE_NAME = "DELIVERY";
-    private static final String[] whitelist = {"/user/signin", "/user/signup", "/owner/signin", "owner/signup"};
+    private static final String[] whitelist = {"/api/user/signin", "/api/user/signup", "/api/owner/signin", "/api/owner/signup"};
 
     private StringRedisTemplate redisTemplate;
 
