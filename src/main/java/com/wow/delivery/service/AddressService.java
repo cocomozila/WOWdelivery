@@ -1,10 +1,12 @@
 package com.wow.delivery.service;
 
 import com.wow.delivery.dto.address.AddressCreateDTO;
+import com.wow.delivery.dto.address.AddressRequestDTO;
 import com.wow.delivery.dto.address.AddressResponse;
 import com.wow.delivery.dto.address.AddressUpdateDTO;
 import com.wow.delivery.entity.Address;
 import com.wow.delivery.entity.User;
+import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.repository.AddressRepository;
 import com.wow.delivery.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +24,8 @@ public class AddressService {
 
     @Transactional
     public void createAddress(AddressCreateDTO addressCreateDTO) {
-        Long id = addressCreateDTO.getUserId();
-        User user = userRepository.getById(id);
+        Long userId = addressCreateDTO.getUserId();
+        User user = userRepository.findByIdOrThrow(userId, ErrorCode.USER_DATA_NOT_FOUND, null);
         Address address = Address.builder()
             .user(user)
             .addressAlias(addressCreateDTO.getAddressAlias())
@@ -36,9 +38,9 @@ public class AddressService {
     }
 
     @Transactional(readOnly = true)
-    public List<AddressResponse> getAddresses(Long userId) {
-        User findUser = userRepository.getById(userId);
-        List<Address> addresses = addressRepository.findAllByUserId(findUser.getId());
+    public List<AddressResponse> getAddresses(AddressRequestDTO addressRequestDTO) {
+        User user = userRepository.findByIdOrThrow(addressRequestDTO.getUserId(), ErrorCode.USER_DATA_NOT_FOUND, null);
+        List<Address> addresses = addressRepository.findAllByUserId(user.getId());
         return addresses.stream()
             .map(address -> new AddressResponse(address.getId(), address.getAddressAlias(), address.getAddressName(),
                 address.getDetailedAddress(), address.getLocationX(), address.getLocationY()))
@@ -47,7 +49,7 @@ public class AddressService {
 
     @Transactional
     public void updateAddress(AddressUpdateDTO addressUpdateDTO) {
-        Address address = addressRepository.getById(addressUpdateDTO.getAddressId());
+        Address address = addressRepository.findByIdOrThrow(addressUpdateDTO.getAddressId(), ErrorCode.ADDRESS_DATA_NOT_FOUND, null);
         address.update(addressUpdateDTO.getAddressAlias(), addressUpdateDTO.getAddressName(), addressUpdateDTO.getDetailedAddress(), addressUpdateDTO.getLocationX(), addressUpdateDTO.getLocationY());
     }
 }

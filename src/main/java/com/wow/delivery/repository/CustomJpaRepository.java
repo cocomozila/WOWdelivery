@@ -8,8 +8,11 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface CustomJpaRepository<T, ID> extends JpaRepository<T, ID> {
 
-    default T getById(ID id) {
+    default T findByIdOrThrow(ID id, ErrorCode errorCode, String errorMessage) {
         return findById(id)
-            .orElseThrow(() -> new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 데이터를 찾을 수 없습니다."));
+            .orElseThrow(() -> {
+                String message = (errorMessage != null) ? errorMessage : errorCode.getMessage();
+                return new DataNotFoundException(errorCode, message);
+            });
     }
 }
