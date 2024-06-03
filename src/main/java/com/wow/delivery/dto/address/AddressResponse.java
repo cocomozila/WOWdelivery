@@ -19,7 +19,6 @@ public class AddressResponse {
     private Double locationY; // y좌표
 
     @Builder
-
     public AddressResponse(Long id, String addressAlias, String addressName, String detailedAddress, Double locationX, Double locationY) {
         this.id = id;
         this.addressAlias = addressAlias;
