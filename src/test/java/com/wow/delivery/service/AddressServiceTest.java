@@ -1,6 +1,7 @@
 package com.wow.delivery.service;
 
 import com.wow.delivery.dto.address.AddressCreateDTO;
+import com.wow.delivery.dto.address.AddressRequestDTO;
 import com.wow.delivery.dto.address.AddressResponse;
 import com.wow.delivery.dto.address.AddressUpdateDTO;
 import com.wow.delivery.entity.Address;
@@ -108,11 +109,15 @@ class AddressServiceTest {
                 .locationY(70001234.1234567)
                 .build();
 
+            AddressRequestDTO addressRequestDTO = AddressRequestDTO.builder()
+                .userId(userId)
+                .build();
+
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
             given(addressRepository.findAllByUserId(any())).willReturn(List.of(address1, address2));
 
             // when
-            List<AddressResponse> addresses = addressService.getAddresses(userId);
+            List<AddressResponse> addresses = addressService.getAddresses(addressRequestDTO);
 
             // then
             Assertions.assertThat(addresses).hasSize(2);
@@ -131,11 +136,15 @@ class AddressServiceTest {
 
             Long userId = 1L;
 
+            AddressRequestDTO addressRequestDTO = AddressRequestDTO.builder()
+                .userId(userId)
+                .build();
+
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
             given(addressRepository.findAllByUserId(any())).willReturn(List.of());
 
             // when
-            List<AddressResponse> addresses = addressService.getAddresses(userId);
+            List<AddressResponse> addresses = addressService.getAddresses(addressRequestDTO);
 
             // then
             Assertions.assertThat(addresses).hasSize(0);
