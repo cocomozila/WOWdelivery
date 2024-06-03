@@ -10,6 +10,8 @@ public enum ErrorCode {
 
     // DataNotFoundException
     DATA_NOT_FOUND("데이터를 찾을 수 없습니다."),
+    USER_DATA_NOT_FOUND("유저 데이터를 찾을 수 없습니다."),
+    ADDRESS_DATA_NOT_FOUND("주소 데이터를 찾을 수 없습니다."),
 
     // Parameter
     INVALID_PARAMETER("유효하지 않은 입력 값입니다."),
