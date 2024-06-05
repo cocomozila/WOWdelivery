@@ -31,8 +31,8 @@ public class AddressService {
             .addressAlias(addressCreateDTO.getAddressAlias())
             .addressName(addressCreateDTO.getAddressName())
             .detailedAddress(addressCreateDTO.getDetailedAddress())
-            .locationX(addressCreateDTO.getLocationX())
-            .locationY(addressCreateDTO.getLocationY())
+            .latitude(addressCreateDTO.getLatitude())
+            .longitude(addressCreateDTO.getLongitude())
             .build();
         addressRepository.save(address);
     }
@@ -43,13 +43,13 @@ public class AddressService {
         List<Address> addresses = addressRepository.findAllByUserId(user.getId());
         return addresses.stream()
             .map(address -> new AddressResponse(address.getId(), address.getAddressAlias(), address.getAddressName(),
-                address.getDetailedAddress(), address.getLocationX(), address.getLocationY()))
+                address.getDetailedAddress(), address.getLatitude(), address.getLongitude()))
             .toList();
     }
 
     @Transactional
     public void updateAddress(AddressUpdateDTO addressUpdateDTO) {
         Address address = addressRepository.findByIdOrThrow(addressUpdateDTO.getAddressId(), ErrorCode.ADDRESS_DATA_NOT_FOUND, null);
-        address.update(addressUpdateDTO.getAddressAlias(), addressUpdateDTO.getAddressName(), addressUpdateDTO.getDetailedAddress(), addressUpdateDTO.getLocationX(), addressUpdateDTO.getLocationY());
+        address.update(addressUpdateDTO.getAddressAlias(), addressUpdateDTO.getAddressName(), addressUpdateDTO.getDetailedAddress(), addressUpdateDTO.getLatitude(), addressUpdateDTO.getLongitude());
     }
 }

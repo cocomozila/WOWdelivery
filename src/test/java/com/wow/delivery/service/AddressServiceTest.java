@@ -51,8 +51,8 @@ class AddressServiceTest {
                 .addressAlias("우리집")
                 .addressName("경기도 고양시 덕양구 호국로 753")
                 .detailedAddress("000동 000호")
-                .locationX(50001234.1234567)
-                .locationY(30001234.1234567)
+                .latitude(50001234.1234567)
+                .longitude(30001234.1234567)
                 .build();
 
             User user = User.builder()
@@ -96,8 +96,8 @@ class AddressServiceTest {
                 .addressAlias("우리집")
                 .addressName("서울 마포구 633")
                 .detailedAddress("무슨빌라 201호")
-                .locationX(50001234.1234567)
-                .locationY(20001234.1234567)
+                .latitude(50001234.1234567)
+                .longitude(20001234.1234567)
                 .build();
 
             Address address2 = Address.builder()
@@ -105,8 +105,8 @@ class AddressServiceTest {
                 .addressAlias("사무실")
                 .addressName("서울 강남구 강남대로 31")
                 .detailedAddress("무슨 오피스텔 401호")
-                .locationX(40001234.1234567)
-                .locationY(70001234.1234567)
+                .latitude(40001234.1234567)
+                .longitude(70001234.1234567)
                 .build();
 
             AddressRequestDTO addressRequestDTO = AddressRequestDTO.builder()
@@ -171,8 +171,8 @@ class AddressServiceTest {
                 .addressAlias("우리집")
                 .addressName("서울 마포구 633")
                 .detailedAddress("무슨빌라 201호")
-                .locationX(50001234.1234567)
-                .locationY(20001234.1234567)
+                .latitude(50001234.1234567)
+                .longitude(20001234.1234567)
                 .build();
 
             AddressUpdateDTO addressUpdateDTO = AddressUpdateDTO.builder()
@@ -180,8 +180,8 @@ class AddressServiceTest {
                 .addressAlias("변경된 집")
                 .addressName("경기도 고양시 덕양구 23길")
                 .detailedAddress("00아파트 000동 000호")
-                .locationX(33331111.1234567)
-                .locationY(11112222.1234567)
+                .latitude(33331111.1234567)
+                .longitude(11112222.1234567)
                 .build();
 
             given(addressRepository.findById(anyLong())).willReturn(Optional.of(address1));
@@ -193,8 +193,8 @@ class AddressServiceTest {
             Assertions.assertThat(address1.getAddressAlias()).isEqualTo("변경된 집");
             Assertions.assertThat(address1.getAddressName()).isEqualTo("경기도 고양시 덕양구 23길");
             Assertions.assertThat(address1.getDetailedAddress()).isEqualTo("00아파트 000동 000호");
-            Assertions.assertThat(address1.getLocationX()).isEqualTo(33331111.1234567);
-            Assertions.assertThat(address1.getLocationY()).isEqualTo(11112222.1234567);
+            Assertions.assertThat(address1.getLatitude()).isEqualTo(33331111.1234567);
+            Assertions.assertThat(address1.getLongitude()).isEqualTo(11112222.1234567);
         }
     }
 }

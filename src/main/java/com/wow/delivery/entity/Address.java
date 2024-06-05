@@ -24,26 +24,26 @@ public class Address extends BaseEntity {
     private String detailedAddress; // 상세주소
 
     @Column(name = "location_x", columnDefinition = "DOUBLE", nullable = false)
-    private Double locationX; // x좌표
+    private Double latitude; // x좌표
 
     @Column(name = "location_y", columnDefinition = "DOUBLE", nullable = false)
-    private Double locationY; // y좌표
+    private Double longitude; // y좌표
 
     @Builder
-    public Address(User user, String addressAlias, String addressName, String detailedAddress, Double locationX, Double locationY) {
+    public Address(User user, String addressAlias, String addressName, String detailedAddress, Double latitude, Double longitude) {
         this.user = user;
         this.addressAlias = addressAlias;
         this.addressName = addressName;
         this.detailedAddress = detailedAddress;
-        this.locationX = locationX;
-        this.locationY = locationY;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
-    public void update(String addressAlias, String addressName, String detailedAddress, Double locationX, Double locationY) {
+    public void update(String addressAlias, String addressName, String detailedAddress, Double latitude, Double longitude) {
         this.addressAlias = addressAlias;
         this.addressName = addressName;
         this.detailedAddress = detailedAddress;
-        this.locationX = locationX;
-        this.locationY = locationY;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }

@@ -21,20 +21,20 @@ public class AddressCreateDTO {
     private String detailedAddress;
 
     @NotNull
-    private Double locationX;
+    private Double latitude;
 
     @NotNull
-    private Double locationY;
+    private Double longitude;
 
     public AddressCreateDTO() {}
 
     @Builder
-    public AddressCreateDTO(Long userId, String addressAlias, String addressName, String detailedAddress, Double locationX, Double locationY) {
+    public AddressCreateDTO(Long userId, String addressAlias, String addressName, String detailedAddress, Double latitude, Double longitude) {
         this.userId = userId;
         this.addressAlias = addressAlias;
         this.addressName = addressName;
         this.detailedAddress = detailedAddress;
-        this.locationX = locationX;
-        this.locationY = locationY;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }
