@@ -14,17 +14,17 @@ public class AddressResponse {
 
     private String detailedAddress; // 상세주소
 
-    private Double locationX; // x좌표
+    private Double latitude; // 위도
 
-    private Double locationY; // y좌표
+    private Double longitude; // 경도
 
     @Builder
-    public AddressResponse(Long id, String addressAlias, String addressName, String detailedAddress, Double locationX, Double locationY) {
+    public AddressResponse(Long id, String addressAlias, String addressName, String detailedAddress, Double latitude, Double longitude) {
         this.id = id;
         this.addressAlias = addressAlias;
         this.addressName = addressName;
         this.detailedAddress = detailedAddress;
-        this.locationX = locationX;
-        this.locationY = locationY;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }
