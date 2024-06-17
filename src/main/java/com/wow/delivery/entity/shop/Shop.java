@@ -17,41 +17,51 @@ public class Shop extends BaseEntity {
     @JoinColumn(name = "owner_id")
     private Owner owner;
 
+    @Comment(value = "가게 명")
     @Column(name = "shop_name", columnDefinition = "VARCHAR(20)", nullable = false)
-    private String shopName; // 가게 명
+    private String shopName;
 
+    @Comment(value = "가게 소개")
     @Column(name = "introduction", columnDefinition = "VARCHAR(255)")
-    private String introduction; // 가게 소개
+    private String introduction;
 
     private BusinessHours businessHours;
 
+    @Comment(value = "최소 주문 금액")
     @Column(name = "min_order_price", columnDefinition = "INT")
-    private int minOrderPrice; // 최소 주문 금액
+    private int minOrderPrice;
 
+    @Comment(value = "주소(도)")
     @Column(name = "state", columnDefinition = "VARCHAR(20)", nullable = false)
-    private String state; // 주소(도)
+    private String state;
 
+    @Comment(value = "주소(시)")
     @Column(name = "city", columnDefinition = "VARCHAR(20)", nullable = false)
-    private String city; // 주소(시)
+    private String city;
 
     @Comment(value = "주소(구,군)")
     @Column(name = "district", columnDefinition = "VARCHAR(20)", nullable = false)
-    private String district; // 주소(구 ,군)
+    private String district;
 
+    @Comment(value = "주소(도로명)")
     @Column(name = "street_name", columnDefinition = "VARCHAR(20)", nullable = false)
-    private String streetName; // 주소(도로명)
+    private String streetName;
 
+    @Comment(value = "주소(빌딩 번호)")
     @Column(name = "building_number", columnDefinition = "VARCHAR(10)", nullable = false)
-    private String buildingNumber; // 주소(빌딩 번호)
+    private String buildingNumber;
 
+    @Comment(value = "상세주소")
     @Column(name = "address_detail", columnDefinition = "VARCHAR(50)")
-    private String addressDetail; // 상세주소
+    private String addressDetail;
 
+    @Comment(value = "위도")
     @Column(name = "latitude", columnDefinition = "DOUBLE", nullable = false)
-    private Double latitude; // 위도
+    private Double latitude;
 
+    @Comment(value = "경도")
     @Column(name = "longitude", columnDefinition = "DOUBLE", nullable = false)
-    private Double longitude; // 경도
+    private Double longitude;
 
     @Embedded
     private S2LevelToken s2LevelToken;

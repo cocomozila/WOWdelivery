@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ShopCategory extends BaseEntity {
 
-    @Column
+    @Column(name = "shop_id")
     private Long shopId;
 
-    @Column
+    @Column(name = "meta_category_id")
     private Long metaCategoryId;
 
     @Builder

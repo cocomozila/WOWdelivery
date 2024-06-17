@@ -1,7 +1,9 @@
 package com.wow.delivery.entity.shop;
 
 import com.wow.delivery.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,17 +17,16 @@ import java.util.List;
 @NoArgsConstructor
 public class OpenDays extends BaseEntity {
 
-    @OneToOne
-    @JoinColumn(name = "shop_id", referencedColumnName = "id")
-    private Shop shop;
+    @Column(name = "shop_id")
+    private Long shopId;
 
     @Column(name = "open_days")
     @Convert(converter = DayOfWeekListConverter.class)
     private List<DayOfWeek> openDays = new ArrayList<>();
 
     @Builder
-    public OpenDays(Shop shop, List<DayOfWeek> openDays) {
-        this.shop = shop;
+    public OpenDays(Long shopId, List<DayOfWeek> openDays) {
+        this.shopId = shopId;
         this.openDays = openDays;
     }
 }
