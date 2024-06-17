@@ -17,32 +17,52 @@ public class Address extends BaseEntity {
     @Column(name = "address_alias", columnDefinition = "VARCHAR(20)")
     private String addressAlias; // 주소 별명
 
-    @Column(name = "address_name", columnDefinition = "VARCHAR(50)", nullable = false)
-    private String addressName; // 주소명
+    @Column(name = "state", columnDefinition = "VARCHAR(20)", nullable = false)
+    private String state; // 주소(도)
 
-    @Column(name = "detailed_address", columnDefinition = "VARCHAR(30)")
-    private String detailedAddress; // 상세주소
+    @Column(name = "city", columnDefinition = "VARCHAR(20)", nullable = false)
+    private String city; // 주소(시)
 
-    @Column(name = "location_x", columnDefinition = "DOUBLE", nullable = false)
-    private Double latitude; // x좌표
+    @Column(name = "district", columnDefinition = "VARCHAR(20)", nullable = false)
+    private String district; // 주소(구,군)
 
-    @Column(name = "location_y", columnDefinition = "DOUBLE", nullable = false)
-    private Double longitude; // y좌표
+    @Column(name = "street_name", columnDefinition = "VARCHAR(20)", nullable = false)
+    private String streetName; // 주소(도로명)
+
+    @Column(name = "building_number", columnDefinition = "VARCHAR(10)", nullable = false)
+    private String buildingNumber; // 주소(빌딩 번호)
+
+    @Column(name = "address_detail", columnDefinition = "VARCHAR(50)")
+    private String addressDetail; // 상세주소
+
+    @Column(name = "latitude", columnDefinition = "DOUBLE", nullable = false)
+    private Double latitude; // 위도
+
+    @Column(name = "longitude", columnDefinition = "DOUBLE", nullable = false)
+    private Double longitude; // 경도
 
     @Builder
-    public Address(User user, String addressAlias, String addressName, String detailedAddress, Double latitude, Double longitude) {
+    public Address(User user, String addressAlias, String state, String city, String district, String streetName, String buildingNumber, String addressDetail, Double latitude, Double longitude) {
         this.user = user;
         this.addressAlias = addressAlias;
-        this.addressName = addressName;
-        this.detailedAddress = detailedAddress;
+        this.state = state;
+        this.city = city;
+        this.district = district;
+        this.streetName = streetName;
+        this.buildingNumber = buildingNumber;
+        this.addressDetail = addressDetail;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public void update(String addressAlias, String addressName, String detailedAddress, Double latitude, Double longitude) {
+    public void update(String addressAlias, String state, String city, String district, String streetName, String buildingNumber, String addressDetail, Double latitude, Double longitude) {
         this.addressAlias = addressAlias;
-        this.addressName = addressName;
-        this.detailedAddress = detailedAddress;
+        this.state = state;
+        this.city = city;
+        this.district = district;
+        this.streetName = streetName;
+        this.buildingNumber = buildingNumber;
+        this.addressDetail = addressDetail;
         this.latitude = latitude;
         this.longitude = longitude;
     }
