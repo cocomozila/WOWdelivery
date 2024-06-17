@@ -53,7 +53,7 @@ public class ShopService {
         shopRepository.save(shop);
 
         OpenDays openDays = OpenDays.builder()
-            .shop(shop)
+            .shopId(shop.getId())
             .openDays(shopCreateDTO.getOpenDays())
             .build();
 
