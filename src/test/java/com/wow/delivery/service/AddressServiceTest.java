@@ -49,10 +49,14 @@ class AddressServiceTest {
             AddressCreateDTO addressCreateDTO = AddressCreateDTO.builder()
                 .userId(1L)
                 .addressAlias("우리집")
-                .addressName("경기도 고양시 덕양구 호국로 753")
-                .detailedAddress("000동 000호")
-                .latitude(50001234.1234567)
-                .longitude(30001234.1234567)
+                .state("경기도")
+                .city("고양시")
+                .district("덕양구")
+                .streetName("호국로")
+                .buildingNumber("754")
+                .addressDetail("000동 000호")
+                .latitude(126.8338819)
+                .longitude(37.6639380)
                 .build();
 
             User user = User.builder()
@@ -94,19 +98,27 @@ class AddressServiceTest {
             Address address1 = Address.builder()
                 .user(user)
                 .addressAlias("우리집")
-                .addressName("서울 마포구 633")
-                .detailedAddress("무슨빌라 201호")
-                .latitude(50001234.1234567)
-                .longitude(20001234.1234567)
+                .state("경기도")
+                .city("고양시")
+                .district("덕양구")
+                .streetName("호국로")
+                .buildingNumber("754")
+                .addressDetail("000동 000호")
+                .latitude(126.8338819)
+                .longitude(37.6639380)
                 .build();
 
             Address address2 = Address.builder()
                 .user(user)
                 .addressAlias("사무실")
-                .addressName("서울 강남구 강남대로 31")
-                .detailedAddress("무슨 오피스텔 401호")
-                .latitude(40001234.1234567)
-                .longitude(70001234.1234567)
+                .state("서울특별시")
+                .city("서울시")
+                .district("강남구")
+                .streetName("강남대로")
+                .buildingNumber("31")
+                .addressDetail("무슨 오피스텔 401호")
+                .latitude(126.8338819)
+                .longitude(37.6639380)
                 .build();
 
             AddressRequestDTO addressRequestDTO = AddressRequestDTO.builder()
@@ -169,19 +181,27 @@ class AddressServiceTest {
             Address address1 = Address.builder()
                 .user(user)
                 .addressAlias("우리집")
-                .addressName("서울 마포구 633")
-                .detailedAddress("무슨빌라 201호")
-                .latitude(50001234.1234567)
-                .longitude(20001234.1234567)
+                .state("경기도")
+                .city("고양시")
+                .district("덕양구")
+                .streetName("호국로")
+                .buildingNumber("754")
+                .addressDetail("000동 000호")
+                .latitude(126.8338819)
+                .longitude(37.6639380)
                 .build();
 
             AddressUpdateDTO addressUpdateDTO = AddressUpdateDTO.builder()
                 .addressId(1L)
                 .addressAlias("변경된 집")
-                .addressName("경기도 고양시 덕양구 23길")
-                .detailedAddress("00아파트 000동 000호")
-                .latitude(33331111.1234567)
-                .longitude(11112222.1234567)
+                .state("경기도")
+                .city("고양시")
+                .district("덕양구")
+                .streetName("호국로")
+                .buildingNumber("742")
+                .addressDetail("111동 111호")
+                .latitude(126.8338819)
+                .longitude(37.6639380)
                 .build();
 
             given(addressRepository.findById(anyLong())).willReturn(Optional.of(address1));
@@ -191,10 +211,9 @@ class AddressServiceTest {
 
             // then
             Assertions.assertThat(address1.getAddressAlias()).isEqualTo("변경된 집");
-            Assertions.assertThat(address1.getAddressName()).isEqualTo("경기도 고양시 덕양구 23길");
-            Assertions.assertThat(address1.getDetailedAddress()).isEqualTo("00아파트 000동 000호");
-            Assertions.assertThat(address1.getLatitude()).isEqualTo(33331111.1234567);
-            Assertions.assertThat(address1.getLongitude()).isEqualTo(11112222.1234567);
+            Assertions.assertThat(address1.getAddressDetail()).isEqualTo("111동 111호");
+            Assertions.assertThat(address1.getLatitude()).isEqualTo(126.8338819);
+            Assertions.assertThat(address1.getLongitude()).isEqualTo(37.6639380);
         }
     }
 }

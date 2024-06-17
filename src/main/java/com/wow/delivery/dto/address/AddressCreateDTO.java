@@ -14,11 +14,17 @@ public class AddressCreateDTO {
     @NotBlank
     private String addressAlias;
 
-    @NotBlank
-    private String addressName;
+    private String state; // 주소(도)
 
-    @NotNull
-    private String detailedAddress;
+    private String city; // 주소(시)
+
+    private String district; // 주소(구,군)
+
+    private String streetName; // 주소(도로명)
+
+    private String buildingNumber; // 주소(빌딩 번호)
+
+    private String addressDetail; // 상세주소
 
     @NotNull
     private Double latitude;
@@ -29,11 +35,15 @@ public class AddressCreateDTO {
     public AddressCreateDTO() {}
 
     @Builder
-    public AddressCreateDTO(Long userId, String addressAlias, String addressName, String detailedAddress, Double latitude, Double longitude) {
+    public AddressCreateDTO(Long userId, String addressAlias, String state, String city, String district, String streetName, String buildingNumber, String addressDetail, Double latitude, Double longitude) {
         this.userId = userId;
         this.addressAlias = addressAlias;
-        this.addressName = addressName;
-        this.detailedAddress = detailedAddress;
+        this.state = state;
+        this.city = city;
+        this.district = district;
+        this.streetName = streetName;
+        this.buildingNumber = buildingNumber;
+        this.addressDetail = addressDetail;
         this.latitude = latitude;
         this.longitude = longitude;
     }

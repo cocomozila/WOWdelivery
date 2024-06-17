@@ -29,8 +29,12 @@ public class AddressService {
         Address address = Address.builder()
             .user(user)
             .addressAlias(addressCreateDTO.getAddressAlias())
-            .addressName(addressCreateDTO.getAddressName())
-            .detailedAddress(addressCreateDTO.getDetailedAddress())
+            .state(addressCreateDTO.getState())
+            .city(addressCreateDTO.getCity())
+            .district(addressCreateDTO.getDistrict())
+            .streetName(addressCreateDTO.getStreetName())
+            .buildingNumber(addressCreateDTO.getBuildingNumber())
+            .addressDetail(addressCreateDTO.getAddressDetail())
             .latitude(addressCreateDTO.getLatitude())
             .longitude(addressCreateDTO.getLongitude())
             .build();
@@ -42,14 +46,17 @@ public class AddressService {
         User user = userRepository.findByIdOrThrow(addressRequestDTO.getUserId(), ErrorCode.USER_DATA_NOT_FOUND, null);
         List<Address> addresses = addressRepository.findAllByUserId(user.getId());
         return addresses.stream()
-            .map(address -> new AddressResponse(address.getId(), address.getAddressAlias(), address.getAddressName(),
-                address.getDetailedAddress(), address.getLatitude(), address.getLongitude()))
+            .map(address -> new AddressResponse(address.getId(), address.getAddressAlias(), address.getState(),
+                address.getCity(), address.getDistrict(), address.getStreetName(), address.getBuildingNumber(),
+                address.getAddressDetail(), address.getLatitude(), address.getLongitude()))
             .toList();
     }
 
     @Transactional
     public void updateAddress(AddressUpdateDTO addressUpdateDTO) {
         Address address = addressRepository.findByIdOrThrow(addressUpdateDTO.getAddressId(), ErrorCode.ADDRESS_DATA_NOT_FOUND, null);
-        address.update(addressUpdateDTO.getAddressAlias(), addressUpdateDTO.getAddressName(), addressUpdateDTO.getDetailedAddress(), addressUpdateDTO.getLatitude(), addressUpdateDTO.getLongitude());
+        address.update(addressUpdateDTO.getAddressAlias(), addressUpdateDTO.getState(),
+            addressUpdateDTO.getCity(), addressUpdateDTO.getDistrict(), addressUpdateDTO.getStreetName(), addressUpdateDTO.getBuildingNumber(),
+            addressUpdateDTO.getAddressDetail(), addressUpdateDTO.getLatitude(), addressUpdateDTO.getLongitude());
     }
 }
