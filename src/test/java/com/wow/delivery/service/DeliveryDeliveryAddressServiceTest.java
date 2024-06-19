@@ -4,8 +4,9 @@ import com.wow.delivery.dto.address.AddressCreateDTO;
 import com.wow.delivery.dto.address.AddressRequestDTO;
 import com.wow.delivery.dto.address.AddressResponse;
 import com.wow.delivery.dto.address.AddressUpdateDTO;
-import com.wow.delivery.entity.Address;
+import com.wow.delivery.entity.DeliveryAddress;
 import com.wow.delivery.entity.User;
+import com.wow.delivery.entity.common.Address;
 import com.wow.delivery.repository.AddressRepository;
 import com.wow.delivery.repository.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -27,10 +28,10 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
-class AddressServiceTest {
+class DeliveryDeliveryAddressServiceTest {
 
     @InjectMocks
-    private AddressService addressService;
+    private DeliveryAddressService deliveryAddressService;
 
     @Spy
     private AddressRepository addressRepository;
@@ -40,7 +41,7 @@ class AddressServiceTest {
 
     @Nested
     @DisplayName("주소 등록")
-    class CreateAddress {
+    class CreateDeliveryAddress {
 
         @Test
         @DisplayName("성공")
@@ -69,7 +70,7 @@ class AddressServiceTest {
             given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
 
             // when
-            addressService.createAddress(addressCreateDTO);
+            deliveryAddressService.createDeliveryAddress(addressCreateDTO);
 
             // then
             then(addressRepository)
@@ -80,7 +81,7 @@ class AddressServiceTest {
 
     @Nested
     @DisplayName("주소 조회")
-    class FindAddress {
+    class FindDeliveryAddress {
 
         @Test
         @DisplayName("성공")
@@ -95,30 +96,34 @@ class AddressServiceTest {
 
             Long userId = 1L;
 
-            Address address1 = Address.builder()
+            DeliveryAddress deliveryAddress1 = DeliveryAddress.builder()
                 .user(user)
                 .addressAlias("우리집")
-                .state("경기도")
-                .city("고양시")
-                .district("덕양구")
-                .streetName("호국로")
-                .buildingNumber("754")
-                .addressDetail("000동 000호")
-                .latitude(126.8338819)
-                .longitude(37.6639380)
+                .address(Address.builder()
+                    .state("경기도")
+                    .city("고양시")
+                    .district("덕양구")
+                    .streetName("호국로")
+                    .buildingNumber("754")
+                    .addressDetail("000동 000호")
+                    .latitude(126.8338819)
+                    .longitude(37.6639380)
+                    .build())
                 .build();
 
-            Address address2 = Address.builder()
+            DeliveryAddress deliveryAddress2 = DeliveryAddress.builder()
                 .user(user)
                 .addressAlias("사무실")
-                .state("서울특별시")
-                .city("서울시")
-                .district("강남구")
-                .streetName("강남대로")
-                .buildingNumber("31")
-                .addressDetail("무슨 오피스텔 401호")
-                .latitude(126.8338819)
-                .longitude(37.6639380)
+                .address(Address.builder()
+                    .state("서울특별시")
+                    .city("서울시")
+                    .district("강남구")
+                    .streetName("강남대로")
+                    .buildingNumber("31")
+                    .addressDetail("무슨 오피스텔 401호")
+                    .latitude(126.8338819)
+                    .longitude(37.6639380)
+                    .build())
                 .build();
 
             AddressRequestDTO addressRequestDTO = AddressRequestDTO.builder()
@@ -126,10 +131,10 @@ class AddressServiceTest {
                 .build();
 
             given(userRepository.findById(userId)).willReturn(Optional.of(user));
-            given(addressRepository.findAllByUserId(any())).willReturn(List.of(address1, address2));
+            given(addressRepository.findAllByUserId(any())).willReturn(List.of(deliveryAddress1, deliveryAddress2));
 
             // when
-            List<AddressResponse> addresses = addressService.getAddresses(addressRequestDTO);
+            List<AddressResponse> addresses = deliveryAddressService.getAddresses(addressRequestDTO);
 
             // then
             Assertions.assertThat(addresses).hasSize(2);
@@ -156,7 +161,7 @@ class AddressServiceTest {
             given(addressRepository.findAllByUserId(any())).willReturn(List.of());
 
             // when
-            List<AddressResponse> addresses = addressService.getAddresses(addressRequestDTO);
+            List<AddressResponse> addresses = deliveryAddressService.getAddresses(addressRequestDTO);
 
             // then
             Assertions.assertThat(addresses).hasSize(0);
@@ -165,7 +170,7 @@ class AddressServiceTest {
 
     @Nested
     @DisplayName("주소 변경")
-    class UpdateAddress {
+    class UpdateDeliveryAddress {
 
         @Test
         @DisplayName("성공")
@@ -178,17 +183,19 @@ class AddressServiceTest {
                 .phoneNumber("01011112222")
                 .build();
 
-            Address address1 = Address.builder()
+            DeliveryAddress deliveryAddress1 = DeliveryAddress.builder()
                 .user(user)
                 .addressAlias("우리집")
-                .state("경기도")
-                .city("고양시")
-                .district("덕양구")
-                .streetName("호국로")
-                .buildingNumber("754")
-                .addressDetail("000동 000호")
-                .latitude(126.8338819)
-                .longitude(37.6639380)
+                .address(Address.builder()
+                    .state("경기도")
+                    .city("고양시")
+                    .district("덕양구")
+                    .streetName("호국로")
+                    .buildingNumber("754")
+                    .addressDetail("000동 000호")
+                    .latitude(126.8338819)
+                    .longitude(37.6639380)
+                    .build())
                 .build();
 
             AddressUpdateDTO addressUpdateDTO = AddressUpdateDTO.builder()
@@ -204,16 +211,16 @@ class AddressServiceTest {
                 .longitude(37.6639380)
                 .build();
 
-            given(addressRepository.findById(anyLong())).willReturn(Optional.of(address1));
+            given(addressRepository.findById(anyLong())).willReturn(Optional.of(deliveryAddress1));
 
             // when
-            addressService.updateAddress(addressUpdateDTO);
+            deliveryAddressService.updateAddress(addressUpdateDTO);
 
             // then
-            Assertions.assertThat(address1.getAddressAlias()).isEqualTo("변경된 집");
-            Assertions.assertThat(address1.getAddressDetail()).isEqualTo("111동 111호");
-            Assertions.assertThat(address1.getLatitude()).isEqualTo(126.8338819);
-            Assertions.assertThat(address1.getLongitude()).isEqualTo(37.6639380);
+            Assertions.assertThat(deliveryAddress1.getAddressAlias()).isEqualTo("변경된 집");
+            Assertions.assertThat(deliveryAddress1.getAddress().getAddressDetail()).isEqualTo("111동 111호");
+            Assertions.assertThat(deliveryAddress1.getAddress().getLatitude()).isEqualTo(126.8338819);
+            Assertions.assertThat(deliveryAddress1.getAddress().getLongitude()).isEqualTo(37.6639380);
         }
     }
 }
