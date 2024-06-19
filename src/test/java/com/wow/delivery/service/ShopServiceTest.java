@@ -3,8 +3,14 @@ package com.wow.delivery.service;
 import com.wow.delivery.dto.shop.*;
 import com.wow.delivery.entity.Owner;
 import com.wow.delivery.entity.User;
+import com.wow.delivery.entity.common.Address;
+import com.wow.delivery.entity.shop.BusinessHours;
+import com.wow.delivery.entity.shop.S2LevelToken;
 import com.wow.delivery.entity.shop.Shop;
-import com.wow.delivery.repository.*;
+import com.wow.delivery.repository.MetaCategoryRepository;
+import com.wow.delivery.repository.OwnerRepository;
+import com.wow.delivery.repository.ShopCategoryRepository;
+import com.wow.delivery.repository.ShopRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,9 +47,6 @@ class ShopServiceTest {
 
     @Spy
     private OwnerRepository ownerRepository;
-
-    @Spy
-    private OpenDaysRepository openDaysRepository;
 
     @Nested
     @DisplayName("생성")
@@ -88,9 +91,6 @@ class ShopServiceTest {
             then(shopRepository)
                 .should(times(1))
                 .save(any());
-            then(openDaysRepository)
-                .should(times(1))
-                .save(any());
             then(shopCategoryRepository)
                 .should(times(1))
                 .saveAll(any());
@@ -112,34 +112,28 @@ class ShopServiceTest {
                 .phoneNumber("01011112222")
                 .build();
 
-            Owner owner = Owner.builder()
-                .email("owner@gmail.com")
-                .password("12345678")
-                .salt("abcd1234")
-                .phoneNumber("01011112222")
-                .build();
-
-            ShopCreateDTO shopCreateDTO = ShopCreateDTO.builder()
+            Shop shop = Shop.builder()
                 .ownerId(1L)
-                .categoryNames(List.of("버거, 커피"))
                 .shopName("일산 맛집식당")
                 .introduction("주말에 커피와 간식을 즐길 수 있는 아늑한 장소입니다.")
-                .openDays(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
-                .openTime("11:30")
-                .closeTime("21:00")
+                .businessHours(BusinessHours.builder()
+                    .openTime("11:30")
+                    .closeTime("21:00")
+                    .build())
                 .minOrderPrice(12000)
-                .state("경기도")
-                .city("고양시")
-                .district("덕양구")
-                .streetName("화정로")
-                .buildingNumber("53")
-                .addressDetail("102호")
-                .latitude(126.8319146)
-                .longitude(37.6351911)
+                .address(Address.builder()
+                    .state("경기도")
+                    .city("고양시")
+                    .district("덕양구")
+                    .streetName("화정로")
+                    .buildingNumber("53")
+                    .addressDetail("102호")
+                    .latitude(126.8319146)
+                    .longitude(37.6351911)
+                    .build())
+                .openDays(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
+                .s2LevelToken(new S2LevelToken(126.8319146, 37.6351911))
                 .build();
-
-            given(ownerRepository.findById(anyLong())).willReturn(Optional.of(owner));
-            Shop shop = shopService.createShop(shopCreateDTO);
 
             CategoryNearbyShopRequestDTO requestDTO = CategoryNearbyShopRequestDTO.builder()
                 .userId(user.getId())
@@ -175,34 +169,28 @@ class ShopServiceTest {
                 .phoneNumber("01011112222")
                 .build();
 
-            Owner owner = Owner.builder()
-                .email("owner@gmail.com")
-                .password("12345678")
-                .salt("abcd1234")
-                .phoneNumber("01011112222")
-                .build();
-
-            ShopCreateDTO shopCreateDTO = ShopCreateDTO.builder()
+            Shop shop = Shop.builder()
                 .ownerId(1L)
-                .categoryNames(List.of("버거, 커피"))
                 .shopName("일산 맛집식당")
                 .introduction("주말에 커피와 간식을 즐길 수 있는 아늑한 장소입니다.")
-                .openDays(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
-                .openTime("11:30")
-                .closeTime("21:00")
+                .businessHours(BusinessHours.builder()
+                    .openTime("11:30")
+                    .closeTime("21:00")
+                    .build())
                 .minOrderPrice(12000)
-                .state("경기도")
-                .city("고양시")
-                .district("덕양구")
-                .streetName("화정로")
-                .buildingNumber("53")
-                .addressDetail("102호")
-                .latitude(126.8319146)
-                .longitude(37.6351911)
+                .address(Address.builder()
+                    .state("경기도")
+                    .city("고양시")
+                    .district("덕양구")
+                    .streetName("화정로")
+                    .buildingNumber("53")
+                    .addressDetail("102호")
+                    .latitude(126.8319146)
+                    .longitude(37.6351911)
+                    .build())
+                .openDays(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
+                .s2LevelToken(new S2LevelToken(126.8319146, 37.6351911))
                 .build();
-
-            given(ownerRepository.findById(anyLong())).willReturn(Optional.of(owner));
-            Shop shop = shopService.createShop(shopCreateDTO);
 
             NameNearbyShopRequestDTO requestDTO = NameNearbyShopRequestDTO.builder()
                 .userId(user.getId())
@@ -235,35 +223,29 @@ class ShopServiceTest {
         @Test
         @DisplayName("성공")
         void success_update() {
-            // given
-            Owner owner = Owner.builder()
-                .email("owner@gmail.com")
-                .password("12345678")
-                .salt("abcd1234")
-                .phoneNumber("01011112222")
-                .build();
-
-            ShopCreateDTO shopCreateDTO = ShopCreateDTO.builder()
+            Shop shop = Shop.builder()
                 .ownerId(1L)
-                .categoryNames(List.of("버거, 커피"))
                 .shopName("일산 맛집식당")
                 .introduction("주말에 커피와 간식을 즐길 수 있는 아늑한 장소입니다.")
-                .openDays(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
-                .openTime("11:30")
-                .closeTime("21:00")
+                .businessHours(BusinessHours.builder()
+                    .openTime("11:30")
+                    .closeTime("21:00")
+                    .build())
                 .minOrderPrice(12000)
-                .state("경기도")
-                .city("고양시")
-                .district("덕양구")
-                .streetName("화정로")
-                .buildingNumber("53")
-                .addressDetail("102호")
-                .latitude(126.8319146)
-                .longitude(37.6351911)
+                .address(Address.builder()
+                    .state("경기도")
+                    .city("고양시")
+                    .district("덕양구")
+                    .streetName("화정로")
+                    .buildingNumber("53")
+                    .addressDetail("102호")
+                    .latitude(126.8319146)
+                    .longitude(37.6351911)
+                    .build())
+                .openDays(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
+                .s2LevelToken(new S2LevelToken(126.8319146, 37.6351911))
                 .build();
 
-            given(ownerRepository.findById(anyLong())).willReturn(Optional.of(owner));
-            Shop shop = shopService.createShop(shopCreateDTO);
             given(shopRepository.findById(anyLong())).willReturn(Optional.of(shop));
 
             ShopUpdateDTO shopUpdateDTO = ShopUpdateDTO.builder()
