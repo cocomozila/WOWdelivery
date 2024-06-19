@@ -3,9 +3,13 @@ package com.wow.delivery.service;
 import com.google.common.geometry.*;
 import com.wow.delivery.dto.shop.*;
 import com.wow.delivery.entity.Owner;
+import com.wow.delivery.entity.common.Address;
 import com.wow.delivery.entity.shop.*;
 import com.wow.delivery.error.ErrorCode;
-import com.wow.delivery.repository.*;
+import com.wow.delivery.repository.MetaCategoryRepository;
+import com.wow.delivery.repository.OwnerRepository;
+import com.wow.delivery.repository.ShopCategoryRepository;
+import com.wow.delivery.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +27,14 @@ public class ShopService {
     private final ShopCategoryRepository shopCategoryRepository;
     private final MetaCategoryRepository metaCategoryRepository;
     private final OwnerRepository ownerRepository;
-    private final OpenDaysRepository openDaysRepository;
 
     @Transactional
-    public Shop createShop(ShopCreateDTO shopCreateDTO) {
+    public void createShop(ShopCreateDTO shopCreateDTO) {
         Long ownerId = shopCreateDTO.getOwnerId();
         Owner owner = ownerRepository.findByIdOrThrow(ownerId, ErrorCode.OWNER_DATA_NOT_FOUND, null);
 
         Shop shop = Shop.builder()
-            .owner(owner)
+            .ownerId(owner.getId())
             .shopName(shopCreateDTO.getShopName())
             .introduction(shopCreateDTO.getIntroduction())
             .businessHours(BusinessHours.builder()
@@ -39,61 +42,56 @@ public class ShopService {
                 .closeTime(shopCreateDTO.getCloseTime())
                 .build())
             .minOrderPrice(shopCreateDTO.getMinOrderPrice())
-            .state(shopCreateDTO.getState())
-            .city(shopCreateDTO.getCity())
-            .district(shopCreateDTO.getDistrict())
-            .streetName(shopCreateDTO.getStreetName())
-            .buildingNumber(shopCreateDTO.getBuildingNumber())
-            .addressDetail(shopCreateDTO.getAddressDetail())
-            .latitude(shopCreateDTO.getLatitude())
-            .longitude(shopCreateDTO.getLongitude())
+            .address(Address.builder()
+                .state(shopCreateDTO.getState())
+                .city(shopCreateDTO.getCity())
+                .district(shopCreateDTO.getDistrict())
+                .streetName(shopCreateDTO.getStreetName())
+                .buildingNumber(shopCreateDTO.getBuildingNumber())
+                .addressDetail(shopCreateDTO.getAddressDetail())
+                .latitude(shopCreateDTO.getLatitude())
+                .longitude(shopCreateDTO.getLongitude())
+                .build())
+            .openDays(shopCreateDTO.getOpenDays())
             .s2LevelToken(new S2LevelToken(shopCreateDTO.getLatitude(), shopCreateDTO.getLongitude()))
             .build();
 
         shopRepository.save(shop);
 
-        OpenDays openDays = OpenDays.builder()
-            .shopId(shop.getId())
-            .openDays(shopCreateDTO.getOpenDays())
-            .build();
-
-        List<ShopCategory> shopCategories = getShopCategories(shopCreateDTO, shop.getId());
-
-        openDaysRepository.save(openDays);
+        List<ShopCategory> shopCategories = createShopCategories(shopCreateDTO.getCategoryNames(), shop.getId());
         shopCategoryRepository.saveAll(shopCategories);
-        return shop;
     }
 
     @Transactional(readOnly = true)
     public List<NearByShopResponse> getCategoryNearByShops(CategoryNearbyShopRequestDTO requestDTO) {
-        List<Shop> shops;
-        if (isPopulatedArea(requestDTO.getState())) {
-            List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
-            shops = shopRepository.findByCategoryNearbyShopLevel13(tokens, requestDTO.getSearchCategory());
-        } else {
-            List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
-            shops = shopRepository.findByCategoryNearbyShopLevel12(tokens, requestDTO.getSearchCategory());
-        }
-
-        return shops.stream()
+        return findShopsByDensity(requestDTO).stream()
             .map(s -> new NearByShopResponse(s.getId(), s.getShopName(), s.getMinOrderPrice()))
             .toList();
     }
 
-    @Transactional(readOnly = true)
-    public List<NearByShopResponse> getNameNearByShops(NameNearbyShopRequestDTO requestDTO) {
-        List<Shop> shops;
+    private List<Shop> findShopsByDensity(CategoryNearbyShopRequestDTO requestDTO) {
         if (isPopulatedArea(requestDTO.getState())) {
             List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
-            shops = shopRepository.findByShopNameNearbyShopLevel13(tokens, requestDTO.getSearchShopName());
-        } else {
-            List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
-            shops = shopRepository.findByShopNameNearbyShopLevel12(tokens, requestDTO.getSearchShopName());
+            return shopRepository.findByCategoryNearbyShopLevel13(tokens, requestDTO.getSearchCategory());
         }
+        List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
+        return shopRepository.findByCategoryNearbyShopLevel12(tokens, requestDTO.getSearchCategory());
+    }
 
-        return shops.stream()
+    @Transactional(readOnly = true)
+    public List<NearByShopResponse> getNameNearByShops(NameNearbyShopRequestDTO requestDTO) {
+        return findShopsByDensity(requestDTO).stream()
             .map(s -> new NearByShopResponse(s.getId(), s.getShopName(), s.getMinOrderPrice()))
             .toList();
+    }
+
+    private List<Shop> findShopsByDensity(NameNearbyShopRequestDTO requestDTO) {
+        if (isPopulatedArea(requestDTO.getState())) {
+            List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
+            return shopRepository.findByShopNameNearbyShopLevel13(tokens, requestDTO.getSearchShopName());
+        }
+        List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
+        return shopRepository.findByShopNameNearbyShopLevel12(tokens, requestDTO.getSearchShopName());
     }
 
     @Transactional
@@ -107,15 +105,18 @@ public class ShopService {
                 .openTime(shopUpdateDTO.getOpenTime())
                 .closeTime(shopUpdateDTO.getCloseTime())
                 .build(),
+            Address.builder()
+                .state(shopUpdateDTO.getState())
+                .city(shopUpdateDTO.getCity())
+                .district(shopUpdateDTO.getDistrict())
+                .streetName(shopUpdateDTO.getStreetName())
+                .buildingNumber(shopUpdateDTO.getBuildingNumber())
+                .addressDetail(shopUpdateDTO.getAddressDetail())
+                .latitude(shopUpdateDTO.getLatitude())
+                .longitude(shopUpdateDTO.getLongitude())
+                .build(),
+            shopUpdateDTO.getOpenDays(),
             shopUpdateDTO.getMinOrderPrice(),
-            shopUpdateDTO.getState(),
-            shopUpdateDTO.getCity(),
-            shopUpdateDTO.getDistrict(),
-            shopUpdateDTO.getStreetName(),
-            shopUpdateDTO.getBuildingNumber(),
-            shopUpdateDTO.getAddressDetail(),
-            shopUpdateDTO.getLatitude(),
-            shopUpdateDTO.getLongitude(),
             new S2LevelToken(shopUpdateDTO.getLatitude(), shopUpdateDTO.getLongitude())
         );
     }
@@ -143,15 +144,13 @@ public class ShopService {
         ArrayList<S2CellId> coveringCells = new ArrayList<>();
         coverer.getCovering(cap, coveringCells);
 
-        List<String> tokens = new ArrayList<>();
-        for (S2CellId cell : coveringCells) {
-            tokens.add(cell.toToken());
-        }
-        return tokens;
+        return coveringCells.stream()
+            .map(S2CellId::toToken)
+            .toList();
     }
 
-    private List<ShopCategory> getShopCategories(ShopCreateDTO createDTO, Long shopId) {
-        List<MetaCategory> allByCategoryName = metaCategoryRepository.findAllByCategoryName(createDTO.getCategoryNames());
+    private List<ShopCategory> createShopCategories(List<String> categoryNames, Long shopId) {
+        List<MetaCategory> allByCategoryName = metaCategoryRepository.findAllByCategoryNameIn(categoryNames);
         return allByCategoryName.stream()
             .map(m -> ShopCategory.builder()
                 .shopId(shopId)
