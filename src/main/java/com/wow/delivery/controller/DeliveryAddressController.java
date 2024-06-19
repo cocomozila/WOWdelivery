@@ -4,7 +4,7 @@ import com.wow.delivery.dto.address.AddressCreateDTO;
 import com.wow.delivery.dto.address.AddressRequestDTO;
 import com.wow.delivery.dto.address.AddressResponse;
 import com.wow.delivery.dto.address.AddressUpdateDTO;
-import com.wow.delivery.service.AddressService;
+import com.wow.delivery.service.DeliveryAddressService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,24 +16,24 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/addresses")
 @RequiredArgsConstructor
-public class AddressController {
+public class DeliveryAddressController {
 
-    private final AddressService addressService;
+    private final DeliveryAddressService deliveryAddressService;
 
     @PostMapping
     public ResponseEntity<HttpStatus> register(@RequestBody @Valid AddressCreateDTO addressCreateDTO) {
-        addressService.createAddress(addressCreateDTO);
+        deliveryAddressService.createDeliveryAddress(addressCreateDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<AddressResponse>> getAddresses(@RequestBody AddressRequestDTO addressRequestDTO) {
-        return ResponseEntity.ok(addressService.getAddresses(addressRequestDTO));
+        return ResponseEntity.ok(deliveryAddressService.getAddresses(addressRequestDTO));
     }
 
     @PutMapping
     public ResponseEntity<HttpStatus> updateAddress(@RequestBody @Valid AddressUpdateDTO addressUpdateDTO) {
-        addressService.updateAddress(addressUpdateDTO);
+        deliveryAddressService.updateAddress(addressUpdateDTO);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
