@@ -135,6 +135,8 @@ public class OwnerServiceTest {
                 .phoneNumber(signupOwner.getPhoneNumber())
                 .build();
 
+            owner.setId(1L);
+
             OwnerSigninDTO signinDTO = OwnerSigninDTO.builder()
                 .email("test@gmail.com")
                 .password("12345678")

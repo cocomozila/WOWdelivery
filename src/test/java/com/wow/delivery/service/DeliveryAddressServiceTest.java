@@ -28,7 +28,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
-class DeliveryDeliveryAddressServiceTest {
+class DeliveryAddressServiceTest {
 
     @InjectMocks
     private DeliveryAddressService deliveryAddressService;
@@ -67,6 +67,8 @@ class DeliveryDeliveryAddressServiceTest {
                 .phoneNumber("01011112222")
                 .build();
 
+            user.setId(1L);
+
             given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
 
             // when
@@ -94,10 +96,10 @@ class DeliveryDeliveryAddressServiceTest {
                 .phoneNumber("01011112222")
                 .build();
 
-            Long userId = 1L;
+            user.setId(1L);
 
             DeliveryAddress deliveryAddress1 = DeliveryAddress.builder()
-                .user(user)
+                .userId(1L)
                 .addressAlias("우리집")
                 .address(Address.builder()
                     .state("경기도")
@@ -111,8 +113,10 @@ class DeliveryDeliveryAddressServiceTest {
                     .build())
                 .build();
 
+            deliveryAddress1.setId(1L);
+
             DeliveryAddress deliveryAddress2 = DeliveryAddress.builder()
-                .user(user)
+                .userId(1L)
                 .addressAlias("사무실")
                 .address(Address.builder()
                     .state("서울특별시")
@@ -126,11 +130,13 @@ class DeliveryDeliveryAddressServiceTest {
                     .build())
                 .build();
 
+            deliveryAddress2.setId(2L);
+
             AddressRequestDTO addressRequestDTO = AddressRequestDTO.builder()
-                .userId(userId)
+                .userId(user.getIdOrThrow())
                 .build();
 
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userRepository.findById(user.getIdOrThrow())).willReturn(Optional.of(user));
             given(addressRepository.findAllByUserId(any())).willReturn(List.of(deliveryAddress1, deliveryAddress2));
 
             // when
@@ -151,13 +157,13 @@ class DeliveryDeliveryAddressServiceTest {
                 .phoneNumber("01011112222")
                 .build();
 
-            Long userId = 1L;
+            user.setId(1L);
 
             AddressRequestDTO addressRequestDTO = AddressRequestDTO.builder()
-                .userId(userId)
+                .userId(user.getIdOrThrow())
                 .build();
 
-            given(userRepository.findById(userId)).willReturn(Optional.of(user));
+            given(userRepository.findById(user.getIdOrThrow())).willReturn(Optional.of(user));
             given(addressRepository.findAllByUserId(any())).willReturn(List.of());
 
             // when
@@ -176,15 +182,8 @@ class DeliveryDeliveryAddressServiceTest {
         @DisplayName("성공")
         void updateAddress() {
             // given
-            User user = User.builder()
-                .email("abcd@gmail.com")
-                .password("12345678")
-                .salt("abcd1234")
-                .phoneNumber("01011112222")
-                .build();
-
             DeliveryAddress deliveryAddress1 = DeliveryAddress.builder()
-                .user(user)
+                .userId(1L)
                 .addressAlias("우리집")
                 .address(Address.builder()
                     .state("경기도")

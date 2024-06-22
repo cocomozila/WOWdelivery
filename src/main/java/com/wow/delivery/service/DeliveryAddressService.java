@@ -28,7 +28,7 @@ public class DeliveryAddressService {
         Long userId = addressCreateDTO.getUserId();
         User user = userRepository.findByIdOrThrow(userId, ErrorCode.USER_DATA_NOT_FOUND, null);
         DeliveryAddress deliveryAddress = DeliveryAddress.builder()
-            .user(user)
+            .userId(user.getIdOrThrow())
             .addressAlias(addressCreateDTO.getAddressAlias())
             .address(Address.builder()
                 .state(addressCreateDTO.getState())
@@ -47,10 +47,10 @@ public class DeliveryAddressService {
     @Transactional(readOnly = true)
     public List<AddressResponse> getAddresses(AddressRequestDTO addressRequestDTO) {
         User user = userRepository.findByIdOrThrow(addressRequestDTO.getUserId(), ErrorCode.USER_DATA_NOT_FOUND, null);
-        List<DeliveryAddress> deliveryAddresses = addressRepository.findAllByUserId(user.getId());
+        List<DeliveryAddress> deliveryAddresses = addressRepository.findAllByUserId(user.getIdOrThrow());
         return deliveryAddresses.stream()
             .map(deliveryAddress -> new AddressResponse(
-                deliveryAddress.getId(),
+                deliveryAddress.getIdOrThrow(),
                 deliveryAddress.getAddressAlias(),
                 deliveryAddress.getAddress()))
             .toList();
