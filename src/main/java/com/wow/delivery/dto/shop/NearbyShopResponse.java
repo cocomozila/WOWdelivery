@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class NearByShopResponse {
+public class NearbyShopResponse {
 
     private Long shopId;
 
@@ -13,7 +13,7 @@ public class NearByShopResponse {
     private int minOrderPrice; // 최소 주문 금액
 
     @Builder
-    public NearByShopResponse(Long shopId, String shopName, int minOrderPrice) {
+    public NearbyShopResponse(Long shopId, String shopName, int minOrderPrice) {
         this.shopId = shopId;
         this.shopName = shopName;
         this.minOrderPrice = minOrderPrice;

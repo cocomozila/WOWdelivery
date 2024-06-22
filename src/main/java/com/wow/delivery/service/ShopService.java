@@ -1,6 +1,5 @@
 package com.wow.delivery.service;
 
-import com.google.common.geometry.*;
 import com.wow.delivery.dto.shop.*;
 import com.wow.delivery.entity.Owner;
 import com.wow.delivery.entity.common.Address;
@@ -14,19 +13,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 @Service
 @RequiredArgsConstructor
 public class ShopService {
 
-    private final List<String> POPULATED_STREET_NAMES = List.of("세종대로", "테헤란로", "강남대로", "올림픽대로", "도산대로", "서초대로", "봉은사로", "학동로", "언주로", "송파대로", "성수이로", "여의대로", "반포대로", "동작대로", "양재대로");
-    private final int S2_REGION_COVERER_MAX_CELLS = 16;
     private final ShopRepository shopRepository;
     private final ShopCategoryRepository shopCategoryRepository;
     private final MetaCategoryRepository metaCategoryRepository;
     private final OwnerRepository ownerRepository;
+    private final S2Service s2Service;
 
     @Transactional
     public void createShop(ShopCreateDTO shopCreateDTO) {
@@ -34,7 +32,7 @@ public class ShopService {
         Owner owner = ownerRepository.findByIdOrThrow(ownerId, ErrorCode.OWNER_DATA_NOT_FOUND, null);
 
         Shop shop = Shop.builder()
-            .ownerId(owner.getId())
+            .ownerId(owner.getIdOrThrow())
             .shopName(shopCreateDTO.getShopName())
             .introduction(shopCreateDTO.getIntroduction())
             .businessHours(BusinessHours.builder()
@@ -58,40 +56,40 @@ public class ShopService {
 
         shopRepository.save(shop);
 
-        List<ShopCategory> shopCategories = createShopCategories(shopCreateDTO.getCategoryNames(), shop.getId());
+        List<ShopCategory> shopCategories = buildShopCategories(shopCreateDTO.getCategoryNames(), shop.getId());
         shopCategoryRepository.saveAll(shopCategories);
     }
 
     @Transactional(readOnly = true)
-    public List<NearByShopResponse> getCategoryNearByShops(CategoryNearbyShopRequestDTO requestDTO) {
-        return findShopsByDensity(requestDTO).stream()
-            .map(s -> new NearByShopResponse(s.getId(), s.getShopName(), s.getMinOrderPrice()))
+    public List<NearbyShopResponse> getShopsByCategory(CategoryNearbyShopRequestDTO requestDTO) {
+        return findShopsByDensity(requestDTO,
+            shopRepository::findByCategoryNearbyShopLevel13,
+            shopRepository::findByCategoryNearbyShopLevel12,
+            requestDTO.getSearchCategory()).stream()
+            .map(s -> new NearbyShopResponse(s.getId(), s.getShopName(), s.getMinOrderPrice()))
             .toList();
-    }
-
-    private List<Shop> findShopsByDensity(CategoryNearbyShopRequestDTO requestDTO) {
-        if (isPopulatedArea(requestDTO.getState())) {
-            List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
-            return shopRepository.findByCategoryNearbyShopLevel13(tokens, requestDTO.getSearchCategory());
-        }
-        List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
-        return shopRepository.findByCategoryNearbyShopLevel12(tokens, requestDTO.getSearchCategory());
     }
 
     @Transactional(readOnly = true)
-    public List<NearByShopResponse> getNameNearByShops(NameNearbyShopRequestDTO requestDTO) {
-        return findShopsByDensity(requestDTO).stream()
-            .map(s -> new NearByShopResponse(s.getId(), s.getShopName(), s.getMinOrderPrice()))
+    public List<NearbyShopResponse> getShopsByShopName(NameNearbyShopRequestDTO requestDTO) {
+        return findShopsByDensity(requestDTO,
+            shopRepository::findByShopNameNearbyShopLevel13,
+            shopRepository::findByShopNameNearbyShopLevel12,
+            requestDTO.getSearchShopName()).stream()
+            .map(s -> new NearbyShopResponse(s.getId(), s.getShopName(), s.getMinOrderPrice()))
             .toList();
     }
 
-    private List<Shop> findShopsByDensity(NameNearbyShopRequestDTO requestDTO) {
-        if (isPopulatedArea(requestDTO.getState())) {
-            List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
-            return shopRepository.findByShopNameNearbyShopLevel13(tokens, requestDTO.getSearchShopName());
+    private <T> List<Shop> findShopsByDensity(NearbyShopRequestDTO requestDTO,
+                                              BiFunction<List<String>, T, List<Shop>> populatedAreaMethod,
+                                              BiFunction<List<String>, T, List<Shop>> nonPopulatedAreaMethod,
+                                              T searchParameter) {
+        if (s2Service.isPopulatedArea(requestDTO.getState())) {
+            List<String> tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
+            return populatedAreaMethod.apply(tokens, searchParameter);
         }
-        List<String> tokens = getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
-        return shopRepository.findByShopNameNearbyShopLevel12(tokens, requestDTO.getSearchShopName());
+        List<String> tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
+        return nonPopulatedAreaMethod.apply(tokens, searchParameter);
     }
 
     @Transactional
@@ -121,35 +119,7 @@ public class ShopService {
         );
     }
 
-    private boolean isPopulatedArea(String state) {
-        return POPULATED_STREET_NAMES.contains(state);
-    }
-
-    private List<String> getNearbyCellIdTokens(double latitude, double longitude, double radiusMeters, int cellLevel) {
-        S2LatLng center = S2LatLng.fromDegrees(latitude, longitude);
-
-        // 반경을 각도로 변환
-        double earthCircumferenceMeters = 2 * Math.PI * 6371000; // 지구의 둘레 (미터 단위)
-        double angleDegrees = (360.0 * radiusMeters) / earthCircumferenceMeters;
-        S1Angle angle = S1Angle.degrees(angleDegrees);
-
-        S2Cap cap = S2Cap.fromAxisAngle(center.toPoint(), angle);
-
-        // 원하는 크기의 셀을 사용하여 covering 수행
-        S2RegionCoverer coverer = new S2RegionCoverer();
-        coverer.setMinLevel(cellLevel);
-        coverer.setMaxLevel(cellLevel);
-        coverer.setMaxCells(S2_REGION_COVERER_MAX_CELLS); // 사용할 셀의 최대 개수를 설정
-
-        ArrayList<S2CellId> coveringCells = new ArrayList<>();
-        coverer.getCovering(cap, coveringCells);
-
-        return coveringCells.stream()
-            .map(S2CellId::toToken)
-            .toList();
-    }
-
-    private List<ShopCategory> createShopCategories(List<String> categoryNames, Long shopId) {
+    private List<ShopCategory> buildShopCategories(List<String> categoryNames, Long shopId) {
         List<MetaCategory> allByCategoryName = metaCategoryRepository.findAllByCategoryNameIn(categoryNames);
         return allByCategoryName.stream()
             .map(m -> ShopCategory.builder()
