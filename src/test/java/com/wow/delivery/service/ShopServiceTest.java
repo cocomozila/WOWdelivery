@@ -46,6 +46,9 @@ class ShopServiceTest {
     private MetaCategoryRepository metaCategoryRepository;
 
     @Spy
+    private S2Service s2Service;
+
+    @Spy
     private OwnerRepository ownerRepository;
 
     @Nested
@@ -62,6 +65,8 @@ class ShopServiceTest {
                 .salt("abcd1234")
                 .phoneNumber("01011112222")
                 .build();
+
+            owner.setId(1L);
 
             ShopCreateDTO shopCreateDTO = ShopCreateDTO.builder()
                 .ownerId(1L)
@@ -135,7 +140,7 @@ class ShopServiceTest {
                 .s2LevelToken(new S2LevelToken(126.8319146, 37.6351911))
                 .build();
 
-            CategoryNearbyShopRequestDTO requestDTO = CategoryNearbyShopRequestDTO.builder()
+            CategoryNearbyShopRequestDTO requestDTO = CategoryNearbyShopRequestDTO.categoryNearbyShopRequestDTOBuilder()
                 .userId(user.getId())
                 .searchCategory("버거")
                 .state("경기도")
@@ -152,7 +157,7 @@ class ShopServiceTest {
                 .willReturn(List.of(shop));
 
             // when
-            List<NearByShopResponse> shops = shopService.getCategoryNearByShops(requestDTO);
+            List<NearbyShopResponse> shops = shopService.getShopsByCategory(requestDTO);
 
             // then
             Assertions.assertThat(shops.size()).isEqualTo(1);
@@ -192,7 +197,7 @@ class ShopServiceTest {
                 .s2LevelToken(new S2LevelToken(126.8319146, 37.6351911))
                 .build();
 
-            NameNearbyShopRequestDTO requestDTO = NameNearbyShopRequestDTO.builder()
+            NameNearbyShopRequestDTO requestDTO = NameNearbyShopRequestDTO.nameNearbyShopRequestDTOBuilder()
                 .userId(user.getId())
                 .searchShopName("일산")
                 .state("경기도")
@@ -209,7 +214,7 @@ class ShopServiceTest {
                 .willReturn(List.of(shop));
 
             // when
-            List<NearByShopResponse> shops = shopService.getNameNearByShops(requestDTO);
+            List<NearbyShopResponse> shops = shopService.getShopsByShopName(requestDTO);
 
             // then
             Assertions.assertThat(shops.size()).isEqualTo(1);

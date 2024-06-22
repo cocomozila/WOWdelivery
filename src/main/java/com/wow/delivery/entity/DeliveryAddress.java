@@ -1,7 +1,9 @@
 package com.wow.delivery.entity;
 
 import com.wow.delivery.entity.common.Address;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,9 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DeliveryAddress extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId; // userId로 수정
 
     @Column(name = "address_alias", columnDefinition = "VARCHAR(20)")
     private String addressAlias; // 주소 별명
@@ -22,8 +23,8 @@ public class DeliveryAddress extends BaseEntity {
     private Address address;
 
     @Builder
-    public DeliveryAddress(User user, String addressAlias, Address address) {
-        this.user = user;
+    public DeliveryAddress(Long userId, String addressAlias, Address address) {
+        this.userId = userId;
         this.addressAlias = addressAlias;
         this.address = address;
     }
