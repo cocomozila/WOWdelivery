@@ -24,13 +24,13 @@ public class ShopController {
     }
 
     @GetMapping("/category")
-    public ResponseEntity<List<NearByShopResponse>> getCategoryNearByShops(@RequestBody CategoryNearbyShopRequestDTO requestDTO) {
-        return ResponseEntity.ok(shopService.getCategoryNearByShops(requestDTO));
+    public ResponseEntity<List<NearbyShopResponse>> getCategoryNearByShops(@RequestBody CategoryNearbyShopRequestDTO requestDTO) {
+        return ResponseEntity.ok(shopService.getShopsByCategory(requestDTO));
     }
 
     @GetMapping("/name")
-    public ResponseEntity<List<NearByShopResponse>> getNameNearByShops(@RequestBody NameNearbyShopRequestDTO requestDTO) {
-        return ResponseEntity.ok(shopService.getNameNearByShops(requestDTO));
+    public ResponseEntity<List<NearbyShopResponse>> getNameNearByShops(@RequestBody NameNearbyShopRequestDTO requestDTO) {
+        return ResponseEntity.ok(shopService.getShopsByShopName(requestDTO));
     }
 
 
