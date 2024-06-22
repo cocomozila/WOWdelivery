@@ -43,9 +43,9 @@ public class OwnerService {
         if (!PasswordEncoder.matchesPassword(ownerSigninDTO.getPassword(), owner.getPassword(), owner.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
-        setSession(owner.getId(), session);
+        setSession(owner.getIdOrThrow(), session);
         return OwnerSigninResponse.builder()
-            .id(owner.getId())
+            .id(owner.getIdOrThrow())
             .build();
     }
 

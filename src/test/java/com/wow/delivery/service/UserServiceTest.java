@@ -134,6 +134,8 @@ public class UserServiceTest {
                 .phoneNumber(signupDTO.getPhoneNumber())
                 .build();
 
+            user.setId(1L);
+
             UserSigninDTO signinDTO = UserSigninDTO.builder()
                 .email("test@gmail.com")
                 .password("12345678")

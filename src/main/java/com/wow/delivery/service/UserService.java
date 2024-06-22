@@ -43,9 +43,9 @@ public class UserService {
         if (!PasswordEncoder.matchesPassword(userSigninDTO.getPassword(), user.getPassword(), user.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
-        setSession(user.getId() , session);
+        setSession(user.getIdOrThrow() , session);
         return UserSigninResponse.builder()
-            .id(user.getId())
+            .id(user.getIdOrThrow())
             .build();
     }
 
