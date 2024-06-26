@@ -1,9 +1,9 @@
 package com.wow.delivery.service;
 
-import com.wow.delivery.dto.menu.MenuCreateDTO;
+import com.wow.delivery.dto.menu.MenuCreateForm;
 import com.wow.delivery.dto.menu.MenuRequest;
 import com.wow.delivery.dto.menu.MenuResponse;
-import com.wow.delivery.dto.menu.MenuUpdateDTO;
+import com.wow.delivery.dto.menu.MenuUpdateForm;
 import com.wow.delivery.entity.Menu;
 import com.wow.delivery.entity.common.Address;
 import com.wow.delivery.entity.shop.BusinessHours;
@@ -86,20 +86,21 @@ class MenuServiceTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "chicken image".getBytes());
 
-            MenuCreateDTO createDTO = MenuCreateDTO.builder()
+            MenuCreateForm menuCreateForm = MenuCreateForm.builder()
                 .shopId(1L)
                 .name("양념치킨")
                 .introduction("맛있는 양념치킨!")
                 .price(17000)
                 .isSelling(true)
                 .menuOrder(1)
+                .file(file)
                 .build();
 
             given(shopRepository.findById(any()))
                 .willReturn(Optional.of(shop));
 
             // when
-            menuService.createMenu(createDTO, file);
+            menuService.createMenu(menuCreateForm);
 
             // then
             then(menuRepository)
@@ -194,19 +195,20 @@ class MenuServiceTest {
                 MediaType.IMAGE_PNG_VALUE,
                 "chicken image".getBytes());
 
-            MenuUpdateDTO updateDTO = MenuUpdateDTO.builder()
+            MenuUpdateForm menuUpdateForm = MenuUpdateForm.builder()
                 .name("피자")
                 .introduction("매콤한 피자!")
                 .price(10000)
                 .isSelling(true)
                 .menuOrder(1)
+                .file(file)
                 .build();
 
             given(menuRepository.findById(any()))
                 .willReturn(Optional.of(menu));
 
             // when
-            menuService.update(updateDTO, file);
+            menuService.update(menuUpdateForm);
 
             // then
             Assertions.assertThat(menu.getName()).isEqualTo("피자");
