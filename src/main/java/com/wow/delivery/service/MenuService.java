@@ -1,9 +1,9 @@
 package com.wow.delivery.service;
 
-import com.wow.delivery.dto.menu.MenuCreateDTO;
+import com.wow.delivery.dto.menu.MenuCreateForm;
 import com.wow.delivery.dto.menu.MenuRequest;
 import com.wow.delivery.dto.menu.MenuResponse;
-import com.wow.delivery.dto.menu.MenuUpdateDTO;
+import com.wow.delivery.dto.menu.MenuUpdateForm;
 import com.wow.delivery.entity.Menu;
 import com.wow.delivery.entity.shop.Shop;
 import com.wow.delivery.error.ErrorCode;
@@ -12,7 +12,6 @@ import com.wow.delivery.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,17 +24,17 @@ public class MenuService {
     private final ImageService imageService;
 
     @Transactional
-    public void createMenu(MenuCreateDTO menuCreateDTO, MultipartFile file) {
-        Shop shop = shopRepository.findByIdOrThrow(menuCreateDTO.getShopId(), ErrorCode.SHOP_DATA_NOT_FOUND, null);
+    public void createMenu(MenuCreateForm menuCreateForm) {
+        Shop shop = shopRepository.findByIdOrThrow(menuCreateForm.getShopId(), ErrorCode.SHOP_DATA_NOT_FOUND, null);
 
         Menu menu = Menu.builder()
             .shopId(shop.getIdOrThrow())
-            .name(menuCreateDTO.getName())
-            .introduction(menuCreateDTO.getIntroduction())
-            .price(menuCreateDTO.getPrice())
-            .imagePath(imageService.getImagePath(file))
-            .isSelling(menuCreateDTO.isSelling())
-            .menuOrder(menuCreateDTO.getMenuOrder())
+            .name(menuCreateForm.getName())
+            .introduction(menuCreateForm.getIntroduction())
+            .price(menuCreateForm.getPrice())
+            .imagePath(imageService.getImagePath(menuCreateForm.getFile()))
+            .isSelling(menuCreateForm.isSelling())
+            .menuOrder(menuCreateForm.getMenuOrder())
             .build();
         menuRepository.save(menu);
     }
@@ -55,15 +54,15 @@ public class MenuService {
     }
 
     @Transactional
-    public void update(MenuUpdateDTO menuUpdateDTO, MultipartFile file) {
-        Menu menu = menuRepository.findByIdOrThrow(menuUpdateDTO.getMenuId(), ErrorCode.MENU_DATA_NOT_FOUND, null);
+    public void update(MenuUpdateForm menuUpdateForm) {
+        Menu menu = menuRepository.findByIdOrThrow(menuUpdateForm.getMenuId(), ErrorCode.MENU_DATA_NOT_FOUND, null);
         menu.update(
-            menuUpdateDTO.getName(),
-            menuUpdateDTO.getIntroduction(),
-            menuUpdateDTO.getPrice(),
-            imageService.getImagePath(file),
-            menuUpdateDTO.isSelling(),
-            menuUpdateDTO.getMenuOrder()
+            menuUpdateForm.getName(),
+            menuUpdateForm.getIntroduction(),
+            menuUpdateForm.getPrice(),
+            imageService.getImagePath(menuUpdateForm.getFile()),
+            menuUpdateForm.isSelling(),
+            menuUpdateForm.getMenuOrder()
         );
     }
 }
