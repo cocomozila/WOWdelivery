@@ -3,6 +3,7 @@ package com.wow.delivery.service;
 import com.wow.delivery.dto.menu.category.MenuCategoryCreateDTO;
 import com.wow.delivery.dto.menu.category.MenuCategoryOrderUpdateDTO;
 import com.wow.delivery.dto.menu.category.MenuCategoryResponse;
+import com.wow.delivery.dto.menu.category.MenuCategoryUpdateDTO;
 import com.wow.delivery.entity.menu.MenuCategory;
 import com.wow.delivery.entity.shop.Shop;
 import com.wow.delivery.error.ErrorCode;
@@ -48,6 +49,12 @@ public class MenuCategoryService {
                 .menuCategoryOrder(mc.getMenuCategoryOrder())
                 .build())
             .toList();
+    }
+
+    @Transactional
+    public void updateMenuCategory(MenuCategoryUpdateDTO updateDTO) {
+        MenuCategory menuCategory = menuCategoryRepository.findByIdOrThrow(updateDTO.getMenuCategoryId(), ErrorCode.MENU_CATEGORY_NOT_FOUND, null);
+        menuCategory.update(updateDTO.getName());
     }
 
     @Transactional

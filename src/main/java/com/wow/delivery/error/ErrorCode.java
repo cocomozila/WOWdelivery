@@ -15,6 +15,7 @@ public enum ErrorCode {
     OWNER_DATA_NOT_FOUND("가게사장 데이터를 찾을 수 없습니다."),
     SHOP_DATA_NOT_FOUND("가게 데이터를 찾을 수 없습니다."),
     MENU_DATA_NOT_FOUND("메뉴 데이터를 찾을 수 없습니다."),
+    MENU_CATEGORY_NOT_FOUND("메뉴 카테고리를 찾을 수 없습니다."),
 
     // Parameter
     INVALID_PARAMETER("유효하지 않은 입력 값입니다."),

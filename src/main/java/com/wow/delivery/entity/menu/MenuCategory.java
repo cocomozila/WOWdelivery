@@ -35,4 +35,8 @@ public class MenuCategory extends BaseEntity {
     public void createCategoryOrder() {
         this.menuCategoryOrder = this.getId().intValue();
     }
+
+    public void update(String name) {
+        this.name = name;
+    }
 }
