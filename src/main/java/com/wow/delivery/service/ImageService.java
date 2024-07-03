@@ -16,7 +16,7 @@ import java.util.UUID;
 public class ImageService {
 
     private static final String IMAGE_DIRECTORY = "C:\\Users\\josey\\Desktop\\mentoring\\wowbd\\images\\";
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final long MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 
     public String getImagePath(MultipartFile file) {
         return saveFile(file);
