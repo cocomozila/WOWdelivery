@@ -1,0 +1,74 @@
+package com.wow.delivery.service;
+
+import com.wow.delivery.dto.menu.category.MenuCategoryCreateDTO;
+import com.wow.delivery.dto.menu.category.MenuCategoryOrderUpdateDTO;
+import com.wow.delivery.dto.menu.category.MenuCategoryResponse;
+import com.wow.delivery.entity.menu.MenuCategory;
+import com.wow.delivery.entity.shop.Shop;
+import com.wow.delivery.error.ErrorCode;
+import com.wow.delivery.error.exception.DataNotFoundException;
+import com.wow.delivery.repository.MenuCategoryRepository;
+import com.wow.delivery.repository.ShopRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+@Service
+@RequiredArgsConstructor
+public class MenuCategoryService {
+
+    private final MenuCategoryRepository menuCategoryRepository;
+    private final ShopRepository shopRepository;
+
+    @Transactional
+    public void createMenuCategory(MenuCategoryCreateDTO createDTO) {
+        Shop shop = shopRepository.findByIdOrThrow(createDTO.getShopId(), ErrorCode.MENU_CATEGORY_NOT_FOUND, null);
+        MenuCategory menuCategory = MenuCategory.builder()
+            .shopId(shop.getIdOrThrow())
+            .name(createDTO.getName())
+            .build();
+        MenuCategory saveMenuCategory = menuCategoryRepository.save(menuCategory);
+        saveMenuCategory.createCategoryOrder();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MenuCategoryResponse> getMenuCategory(Long shopId) {
+        Shop shop = shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
+        return menuCategoryRepository.findAllByShopId(shop.getIdOrThrow())
+            .orElseThrow(() -> new DataNotFoundException(ErrorCode.MENU_CATEGORY_NOT_FOUND, "메뉴 카테고리가 존재하지 않습니다."))
+            .stream()
+            .map(mc -> MenuCategoryResponse.builder()
+                .MenuCategoryId(mc.getIdOrThrow())
+                .name(mc.getName())
+                .menuCategoryOrder(mc.getMenuCategoryOrder())
+                .build())
+            .toList();
+    }
+
+    @Transactional
+    public void reorderMenuCategories(MenuCategoryOrderUpdateDTO updateDTO) {
+        List<Long> beforeIds = updateDTO.getBeforeIds();
+        List<Long> afterIds = updateDTO.getAfterIds();
+
+        List<MenuCategory> menuCategories = menuCategoryRepository.findByIdIn(beforeIds);
+
+        Map<Long, MenuCategory> menuCategoryMap = menuCategories.stream()
+            .collect(Collectors.toMap(MenuCategory::getId, mc -> mc));
+
+        List<Integer> sortedMenuCategoriesOrders = beforeIds.stream()
+            .map(id -> menuCategoryMap.get(id).getMenuCategoryOrder())
+            .toList();
+
+        IntStream.range(0, updateDTO.getSize())
+            .filter(i -> !beforeIds.get(i).equals(afterIds.get(i)))
+            .forEach(i -> {
+                MenuCategory menuCategory = menuCategoryRepository.findByIdOrThrow(afterIds.get(i), ErrorCode.MENU_DATA_NOT_FOUND, null);
+                menuCategory.setMenuCategoryOrder(sortedMenuCategoriesOrders.get(i));
+            });
+    }
+}
