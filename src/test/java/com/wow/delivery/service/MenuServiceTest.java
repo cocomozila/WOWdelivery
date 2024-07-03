@@ -1,11 +1,11 @@
 package com.wow.delivery.service;
 
 import com.wow.delivery.dto.menu.MenuCreateForm;
-import com.wow.delivery.dto.menu.MenuRequest;
+import com.wow.delivery.dto.menu.MenuOrderUpdateDTO;
 import com.wow.delivery.dto.menu.MenuResponse;
 import com.wow.delivery.dto.menu.MenuUpdateForm;
-import com.wow.delivery.entity.Menu;
 import com.wow.delivery.entity.common.Address;
+import com.wow.delivery.entity.menu.Menu;
 import com.wow.delivery.entity.shop.BusinessHours;
 import com.wow.delivery.entity.shop.S2LevelToken;
 import com.wow.delivery.entity.shop.Shop;
@@ -96,8 +96,21 @@ class MenuServiceTest {
                 .file(file)
                 .build();
 
+            Menu menu = Menu.builder()
+                .shopId(1L)
+                .name("양념치킨")
+                .introduction("맛있는 양념치킨!")
+                .price(17000)
+                .imagePath("image.jpg")
+                .isSelling(true)
+                .build();
+
+            menu.setId(1L);
+
             given(shopRepository.findById(any()))
                 .willReturn(Optional.of(shop));
+            given(menuRepository.save(any()))
+                .willReturn(menu);
 
             // when
             menuService.createMenu(menuCreateForm);
@@ -106,6 +119,7 @@ class MenuServiceTest {
             then(menuRepository)
                 .should(times(1))
                 .save(any());
+            Assertions.assertThat(menu.getMenuOrder()).isEqualTo(1);
         }
     }
 
@@ -149,22 +163,17 @@ class MenuServiceTest {
                 .price(17000)
                 .imagePath("image.jpg")
                 .isSelling(true)
-                .menuOrder(1)
                 .build();
 
             menu.setId(1L);
 
-            MenuRequest menuRequest = MenuRequest.builder()
-                .shopId(1L)
-                .build();
-
             given(shopRepository.findById(any()))
                 .willReturn(Optional.of(shop));
-            given(menuRepository.findAllByIdOrderByMenuOrderAsc(any()))
+            given(menuRepository.findAllByIdOrderByMenuOrder(any()))
                 .willReturn(List.of(menu));
 
             // when
-            List<MenuResponse> menus = menuService.getMenus(menuRequest);
+            List<MenuResponse> menus = menuService.getMenus(1L);
 
             // then
             Assertions.assertThat(menus.size()).isEqualTo(1);
@@ -172,8 +181,8 @@ class MenuServiceTest {
     }
 
     @Nested
-    @DisplayName("수정")
-    class Update {
+    @DisplayName("정보 수정")
+    class InfoUpdate {
 
         @Test
         @DisplayName("성공")
@@ -186,7 +195,6 @@ class MenuServiceTest {
                 .price(17000)
                 .imagePath("image.jpg")
                 .isSelling(true)
-                .menuOrder(1)
                 .build();
 
             MultipartFile file = new MockMultipartFile(
@@ -200,7 +208,6 @@ class MenuServiceTest {
                 .introduction("매콤한 피자!")
                 .price(10000)
                 .isSelling(true)
-                .menuOrder(1)
                 .file(file)
                 .build();
 
@@ -214,6 +221,84 @@ class MenuServiceTest {
             Assertions.assertThat(menu.getName()).isEqualTo("피자");
             Assertions.assertThat(menu.getIntroduction()).isEqualTo("매콤한 피자!");
             Assertions.assertThat(menu.getPrice()).isEqualTo(10000);
+        }
+    }
+
+    @Nested
+    @DisplayName("순위 수정")
+    class MenuOrderUpdate {
+
+        @Test
+        @DisplayName("성공")
+        void success() {
+            // given
+            Menu menu1 = Menu.builder()
+                .shopId(1L)
+                .menuCategoryId(1L)
+                .name("양념치킨")
+                .introduction("맛있는 양념치킨!")
+                .price(17000)
+                .imagePath("image.jpg")
+                .isSelling(true)
+                .build();
+
+            menu1.setId(1L);
+            menu1.createMenuOrder();
+
+            Menu menu2 = Menu.builder()
+                .shopId(1L)
+                .menuCategoryId(1L)
+                .name("순살치킨")
+                .introduction("맛있는 순살치킨!")
+                .price(15000)
+                .imagePath("image1.jpg")
+                .isSelling(true)
+                .build();
+
+            menu2.setId(2L);
+            menu2.createMenuOrder();
+
+            Menu menu3 = Menu.builder()
+                .shopId(1L)
+                .menuCategoryId(1L)
+                .name("바삭한치킨")
+                .introduction("바삭바삭 치킨!")
+                .price(18000)
+                .imagePath("image2.jpg")
+                .isSelling(true)
+                .build();
+
+            menu3.setId(3L);
+            menu3.createMenuOrder();
+
+            List<Long> beforeMenuIds = List.of(1L, 2L, 3L);
+            List<Long> afterMenuIds = List.of(2L, 3L, 1L);
+
+            MenuOrderUpdateDTO updateDTO = MenuOrderUpdateDTO.builder()
+                .menuCategoryId(1L)
+                .beforeMenuIds(beforeMenuIds)
+                .afterMenuIds(afterMenuIds)
+                .build();
+
+            List<Menu> menus = List.of(menu1, menu2, menu3);
+
+            given(menuRepository.findById(1L))
+                .willReturn(Optional.of(menu1));
+            given(menuRepository.findById(2L))
+                .willReturn(Optional.of(menu2));
+            given(menuRepository.findById(3L))
+                .willReturn(Optional.of(menu3));
+            given(menuRepository.findByIdIn(beforeMenuIds))
+                .willReturn(menus);
+
+            // when
+            menuService.reorderMenus(updateDTO);
+
+            // then
+            Assertions.assertThat(menu1.getMenuOrder()).isEqualTo(3);
+            Assertions.assertThat(menu2.getMenuOrder()).isEqualTo(1);
+            Assertions.assertThat(menu3.getMenuOrder()).isEqualTo(2);
+
         }
     }
 }
