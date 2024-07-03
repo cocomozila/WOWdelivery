@@ -17,6 +17,10 @@ public class MenuCreateForm {
     @Comment(value = "가게 ID")
     private Long shopId;
 
+    @NotNull
+    @Comment(value = "메뉴 카테고리 ID")
+    private Long menuCategoryId;
+
     @NotBlank
     @Comment(value = "메뉴 이름")
     private String name;

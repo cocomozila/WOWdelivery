@@ -12,6 +12,9 @@ public class MenuResponse {
     @Comment(value = "메뉴 ID")
     private Long menuId;
 
+    @Comment(value = "메뉴 카테고리 ID")
+    private Long menuCategoryId;
+
     @Comment(value = "메뉴 이름")
     private String name;
 
@@ -24,12 +27,17 @@ public class MenuResponse {
     @Comment(value = "메뉴 이미지 경로")
     private String imagePath;
 
+    @Comment(value = "메뉴 순서")
+    private int menuOrder;
+
     @Builder
-    public MenuResponse(Long menuId, String name, String introduction, int price, String imagePath) {
+    public MenuResponse(Long menuId, Long menuCategoryId, String name, String introduction, int price, String imagePath, int menuOrder) {
         this.menuId = menuId;
+        this.menuCategoryId = menuCategoryId;
         this.name = name;
         this.introduction = introduction;
         this.price = price;
         this.imagePath = imagePath;
+        this.menuOrder = menuOrder;
     }
 }
