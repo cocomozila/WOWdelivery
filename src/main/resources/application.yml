@@ -2,7 +2,13 @@ spring:
   application:
     name: delivery
 
-# MySQL
+  # 파일용량 설정
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  # MySQL
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/wowbd
