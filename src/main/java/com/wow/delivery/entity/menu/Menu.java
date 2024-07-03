@@ -1,10 +1,12 @@
-package com.wow.delivery.entity;
+package com.wow.delivery.entity.menu;
 
+import com.wow.delivery.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
 @Entity
@@ -14,6 +16,10 @@ public class Menu extends BaseEntity {
 
     @Column(name = "shop_id", nullable = false)
     private Long shopId;
+
+    @Comment(value = "메뉴 카테고리 ID")
+    @Column(name = "menu_category_id", nullable = false)
+    private Long menuCategoryId;
 
     @Comment(value = "메뉴 이름")
     @Column(name = "name", columnDefinition = "VARCHAR(20)", nullable = false)
@@ -35,27 +41,32 @@ public class Menu extends BaseEntity {
     @Column(name = "is_selling", columnDefinition = "BOOLEAN", nullable = false)
     private boolean isSelling;
 
+    @Setter
     @Comment(value = "메뉴 순서")
     @Column(name = "menu_order", columnDefinition = "INTEGER", nullable = false)
     private int menuOrder;
 
     @Builder
-    public Menu(Long shopId, String name, String introduction, int price, String imagePath, boolean isSelling, int menuOrder) {
+    public Menu(Long shopId, Long menuCategoryId, String name, String introduction, int price, String imagePath, boolean isSelling) {
         this.shopId = shopId;
+        this.menuCategoryId = menuCategoryId;
         this.name = name;
         this.introduction = introduction;
         this.price = price;
         this.imagePath = imagePath;
         this.isSelling = isSelling;
-        this.menuOrder = menuOrder;
     }
 
-    public void update(String name, String introduction, int price, String imagePath, boolean isSelling, int menuOrder) {
+    public void createMenuOrder() {
+        this.menuOrder = this.getId().intValue();
+    }
+
+    public void update(Long menuCategoryId, String name, String introduction, int price, String imagePath, boolean isSelling) {
+        this.menuCategoryId = menuCategoryId;
         this.name = name;
         this.introduction = introduction;
         this.price = price;
         this.imagePath = imagePath;
         this.isSelling = isSelling;
-        this.menuOrder = menuOrder;
     }
 }
