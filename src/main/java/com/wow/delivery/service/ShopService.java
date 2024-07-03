@@ -25,6 +25,7 @@ public class ShopService {
     private final MetaCategoryRepository metaCategoryRepository;
     private final OwnerRepository ownerRepository;
     private final S2Service s2Service;
+    private final MenuService menuService;
 
     @Transactional
     public void createShop(ShopCreateDTO shopCreateDTO) {
@@ -117,6 +118,20 @@ public class ShopService {
             shopUpdateDTO.getMinOrderPrice(),
             new S2LevelToken(shopUpdateDTO.getLatitude(), shopUpdateDTO.getLongitude())
         );
+    }
+
+    @Transactional(readOnly = true)
+    public ShopResponse getShop(Long shopId) {
+        Shop shop = shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
+        return ShopResponse.builder()
+            .shopName(shop.getShopName())
+            .introduction(shop.getIntroduction())
+            .businessHours(shop.getBusinessHours())
+            .address(shop.getAddress())
+            .openDays(shop.getOpenDays())
+            .minOrderPrice(shop.getMinOrderPrice())
+            .menus(menuService.getMenus(shopId))
+            .build();
     }
 
     private List<ShopCategory> buildShopCategories(List<String> categoryNames, Long shopId) {
