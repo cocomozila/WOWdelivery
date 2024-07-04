@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
@@ -44,7 +45,7 @@ class MenuServiceTest {
     @Spy
     private ShopRepository shopRepository;
 
-    @Spy
+    @Mock
     private ImageService imageService;
 
     @Nested
@@ -92,8 +93,10 @@ class MenuServiceTest {
                 .introduction("맛있는 양념치킨!")
                 .price(17000)
                 .isSelling(true)
-                .menuOrder(1)
                 .file(file)
+                .x(0)
+                .y(0)
+                .length(300)
                 .build();
 
             Menu menu = Menu.builder()
@@ -209,6 +212,9 @@ class MenuServiceTest {
                 .price(10000)
                 .isSelling(true)
                 .file(file)
+                .x(0)
+                .y(0)
+                .length(300)
                 .build();
 
             given(menuRepository.findById(any()))
@@ -282,12 +288,6 @@ class MenuServiceTest {
 
             List<Menu> menus = List.of(menu1, menu2, menu3);
 
-            given(menuRepository.findById(1L))
-                .willReturn(Optional.of(menu1));
-            given(menuRepository.findById(2L))
-                .willReturn(Optional.of(menu2));
-            given(menuRepository.findById(3L))
-                .willReturn(Optional.of(menu3));
             given(menuRepository.findByIdIn(beforeMenuIds))
                 .willReturn(menus);
 
