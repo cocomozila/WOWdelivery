@@ -38,11 +38,21 @@ public class MenuUpdateForm {
     @Comment(value = "메뉴 순서")
     private int menuOrder;
 
+    @Comment(value = "메뉴 이미지")
     private MultipartFile file;
 
+    @Comment(value = "이미지 자를 중심좌표 x값")
+    private int x;
+
+    @Comment(value = "이미지 자를 중심좌표 y값")
+    private int y;
+
+    @Comment(value = "이미지 자를 정사각형 한 변의 사이즈")
+    private int length;
+
     @Builder
-    @ConstructorProperties({"menuCategoryId", "menuId", "name", "introduction", "price", "isSelling", "file"})
-    public MenuUpdateForm(Long menuCategoryId ,Long menuId, String name, String introduction, int price, boolean isSelling, MultipartFile file) {
+    @ConstructorProperties({"menuCategoryId", "menuId", "name", "introduction", "price", "isSelling", "file", "x", "y", "length"})
+    public MenuUpdateForm(Long menuCategoryId ,Long menuId, String name, String introduction, int price, boolean isSelling, MultipartFile file, int x, int y, int length) {
         this.menuCategoryId = menuCategoryId;
         this.menuId = menuId;
         this.name = name;
@@ -50,5 +60,8 @@ public class MenuUpdateForm {
         this.price = price;
         this.isSelling = isSelling;
         this.file = file;
+        this.x = x;
+        this.y = y;
+        this.length = length;
     }
 }

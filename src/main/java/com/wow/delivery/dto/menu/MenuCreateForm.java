@@ -35,22 +35,30 @@ public class MenuCreateForm {
     @Comment(value = "판매 상태")
     private boolean isSelling;
 
-    @Min(1)
-    @Comment(value = "메뉴 순서")
-    private int menuOrder;
-
     @Comment(value = "메뉴 이미지")
     private MultipartFile file;
 
+    @Comment(value = "이미지 자를 중심좌표 x값")
+    private int x;
+
+    @Comment(value = "이미지 자를 중심좌표 y값")
+    private int y;
+
+    @Comment(value = "이미지 자를 정사각형 한 변의 사이즈")
+    private int length;
+
     @Builder
-    @ConstructorProperties({"shopId", "name", "introduction", "price", "isSelling", "menuOrder", "file"})
-    public MenuCreateForm(Long shopId, String name, String introduction, int price, boolean isSelling, int menuOrder, MultipartFile file) {
+    @ConstructorProperties({"shopId", "menuCategoryId", "name", "introduction", "price", "isSelling", "file", "x", "y", "length"})
+    public MenuCreateForm(Long shopId, Long menuCategoryId, String name, String introduction, int price, boolean isSelling, MultipartFile file, int x, int y, int length) {
         this.shopId = shopId;
+        this.menuCategoryId = menuCategoryId;
         this.name = name;
         this.introduction = introduction;
         this.price = price;
         this.isSelling = isSelling;
-        this.menuOrder = menuOrder;
         this.file = file;
+        this.x = x;
+        this.y = y;
+        this.length = length;
     }
 }
