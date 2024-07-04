@@ -8,7 +8,7 @@ import org.hibernate.annotations.Comment;
 public class MenuCategoryResponse {
 
     @Comment("메뉴 카테고리 ID")
-    private Long MenuCategoryId;
+    private Long menuCategoryId;
 
     @Comment(value = "메뉴 카테고리 이름")
     private String name;
@@ -18,7 +18,7 @@ public class MenuCategoryResponse {
 
     @Builder
     public MenuCategoryResponse(Long MenuCategoryId, String name, int menuCategoryOrder) {
-        this.MenuCategoryId = MenuCategoryId;
+        this.menuCategoryId = MenuCategoryId;
         this.name = name;
         this.menuCategoryOrder = menuCategoryOrder;
     }
