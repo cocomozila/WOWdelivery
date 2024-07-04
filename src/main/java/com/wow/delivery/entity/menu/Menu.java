@@ -43,7 +43,7 @@ public class Menu extends BaseEntity {
 
     @Setter
     @Comment(value = "메뉴 순서")
-    @Column(name = "menu_order", columnDefinition = "INTEGER", nullable = false)
+    @Column(name = "\"order\"", columnDefinition = "INTEGER", nullable = false)
     private int menuOrder;
 
     @Builder
