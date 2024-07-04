@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -35,6 +36,9 @@ class MenuCategoryServiceTest {
 
     @Spy
     private MenuCategoryRepository menuCategoryRepository;
+
+    @Mock
+    private ShopService shopService;
 
     @Nested
     @DisplayName("생성")
@@ -61,8 +65,8 @@ class MenuCategoryServiceTest {
             menuCategory.setId(1L);
             menuCategory.createCategoryOrder();
 
-            given(shopRepository.findById(1L))
-                .willReturn(Optional.of(shop));
+            given(shopService.findByShopIdOrThrow(1L))
+                .willReturn(shop);
             given(menuCategoryRepository.save(any()))
                 .willReturn(menuCategory);
 
@@ -100,8 +104,8 @@ class MenuCategoryServiceTest {
                 .build();
             menuCategory2.setId(2L);
 
-            given(shopRepository.findById(1L))
-                .willReturn(Optional.of(shop));
+            given(shopService.findByShopIdOrThrow(1L))
+                .willReturn(shop);
             given(menuCategoryRepository.findAllByShopId(1L))
                 .willReturn(Optional.of(List.of(menuCategory1, menuCategory2)));
 
@@ -155,14 +159,8 @@ class MenuCategoryServiceTest {
                 .afterIds(afterIds)
                 .build();
 
-            List<MenuCategory> menuCategories = List.of(menuCategory1, menuCategory2, menuCategory3);
+            List<MenuCategory> menuCategories = List.of(menuCategory3, menuCategory2, menuCategory1);
 
-            given(menuCategoryRepository.findById(1L))
-                .willReturn(Optional.of(menuCategory1));
-            given(menuCategoryRepository.findById(2L))
-                .willReturn(Optional.of(menuCategory2));
-            given(menuCategoryRepository.findById(3L))
-                .willReturn(Optional.of(menuCategory3));
             given(menuCategoryRepository.findByIdIn(beforeIds))
                 .willReturn(menuCategories);
 
