@@ -36,7 +36,7 @@ public class MenuService {
             .name(menuCreateForm.getName())
             .introduction(menuCreateForm.getIntroduction())
             .price(menuCreateForm.getPrice())
-            .imagePath(imageService.getImagePath(menuCreateForm.getFile()))
+            .imagePath(imageService.getImagePath(menuCreateForm.getFile(), menuCreateForm.getX(), menuCreateForm.getY(), menuCreateForm.getLength()))
             .isSelling(menuCreateForm.isSelling())
             .build();
         Menu saveMenu = menuRepository.save(menu);
@@ -68,7 +68,7 @@ public class MenuService {
             menuUpdateForm.getName(),
             menuUpdateForm.getIntroduction(),
             menuUpdateForm.getPrice(),
-            imageService.getImagePath(menuUpdateForm.getFile()),
+            imageService.getImagePath(menuUpdateForm.getFile(), menuUpdateForm.getX(), menuUpdateForm.getY(), menuUpdateForm.getLength()),
             menuUpdateForm.isSelling()
         );
     }
@@ -90,8 +90,8 @@ public class MenuService {
         IntStream.range(0, updateDTO.getSize())
             .filter(i -> !beforeMenuIds.get(i).equals(afterMenuIds.get(i)))
             .forEach(i -> {
-                Menu menuB = menuRepository.findByIdOrThrow(afterMenuIds.get(i), ErrorCode.MENU_DATA_NOT_FOUND, null);
-                menuB.setMenuOrder(sortedMenuOrders.get(i));
+                Menu menu = menuMap.get(afterMenuIds.get(i));
+                menu.setMenuOrder(sortedMenuOrders.get(i));
             });
     }
 }
