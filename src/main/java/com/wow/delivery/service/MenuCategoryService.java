@@ -25,10 +25,11 @@ public class MenuCategoryService {
 
     private final MenuCategoryRepository menuCategoryRepository;
     private final ShopRepository shopRepository;
+    private final ShopService shopService;
 
     @Transactional
     public void createMenuCategory(MenuCategoryCreateDTO createDTO) {
-        Shop shop = shopRepository.findByIdOrThrow(createDTO.getShopId(), ErrorCode.MENU_CATEGORY_NOT_FOUND, null);
+        Shop shop = shopService.findByShopIdOrThrow(createDTO.getShopId());
         MenuCategory menuCategory = MenuCategory.builder()
             .shopId(shop.getIdOrThrow())
             .name(createDTO.getName())
@@ -39,7 +40,7 @@ public class MenuCategoryService {
 
     @Transactional(readOnly = true)
     public List<MenuCategoryResponse> getMenuCategory(Long shopId) {
-        Shop shop = shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
+        Shop shop = shopService.findByShopIdOrThrow(shopId);
         return menuCategoryRepository.findAllByShopId(shop.getIdOrThrow())
             .orElseThrow(() -> new DataNotFoundException(ErrorCode.MENU_CATEGORY_NOT_FOUND, "메뉴 카테고리가 존재하지 않습니다."))
             .stream()
@@ -74,7 +75,7 @@ public class MenuCategoryService {
         IntStream.range(0, updateDTO.getSize())
             .filter(i -> !beforeIds.get(i).equals(afterIds.get(i)))
             .forEach(i -> {
-                MenuCategory menuCategory = menuCategoryRepository.findByIdOrThrow(afterIds.get(i), ErrorCode.MENU_DATA_NOT_FOUND, null);
+                MenuCategory menuCategory = menuCategoryMap.get(afterIds.get(i));
                 menuCategory.setMenuCategoryOrder(sortedMenuCategoriesOrders.get(i));
             });
     }
