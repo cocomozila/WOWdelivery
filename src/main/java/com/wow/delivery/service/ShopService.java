@@ -25,7 +25,6 @@ public class ShopService {
     private final MetaCategoryRepository metaCategoryRepository;
     private final OwnerRepository ownerRepository;
     private final S2Service s2Service;
-    private final MenuService menuService;
 
     @Transactional
     public void createShop(ShopCreateDTO shopCreateDTO) {
@@ -95,7 +94,7 @@ public class ShopService {
 
     @Transactional
     public void updateShop(ShopUpdateDTO shopUpdateDTO) {
-        Shop shop = shopRepository.findByIdOrThrow(shopUpdateDTO.getShopId(), ErrorCode.SHOP_DATA_NOT_FOUND, null);
+        Shop shop = findByShopIdOrThrow(shopUpdateDTO.getShopId());
 
         shop.update(
             shopUpdateDTO.getShopName(),
@@ -122,7 +121,8 @@ public class ShopService {
 
     @Transactional(readOnly = true)
     public ShopResponse getShop(Long shopId) {
-        Shop shop = shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
+        Shop shop = findByShopIdOrThrow(shopId);
+
         return ShopResponse.builder()
             .shopName(shop.getShopName())
             .introduction(shop.getIntroduction())
@@ -130,7 +130,6 @@ public class ShopService {
             .address(shop.getAddress())
             .openDays(shop.getOpenDays())
             .minOrderPrice(shop.getMinOrderPrice())
-            .menus(menuService.getMenus(shopId))
             .build();
     }
 
@@ -142,5 +141,9 @@ public class ShopService {
                 .metaCategoryId(m.getId())
                 .build())
             .toList();
+    }
+
+    public Shop findByShopIdOrThrow(Long shopId) {
+        return shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
     }
 }

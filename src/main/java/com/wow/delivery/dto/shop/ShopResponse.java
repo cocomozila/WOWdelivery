@@ -1,6 +1,5 @@
 package com.wow.delivery.dto.shop;
 
-import com.wow.delivery.dto.menu.MenuResponse;
 import com.wow.delivery.entity.common.Address;
 import com.wow.delivery.entity.shop.BusinessHours;
 import com.wow.delivery.entity.shop.DayOfWeekListConverter;
@@ -36,17 +35,13 @@ public class ShopResponse {
     @Comment(value = "최소 주문 금액")
     private int minOrderPrice;
 
-    @Comment(value = "메뉴들")
-    private List<MenuResponse> menus;
-
     @Builder
-    public ShopResponse(String shopName, String introduction, BusinessHours businessHours, Address address, List<DayOfWeek> openDays, int minOrderPrice, List<MenuResponse> menus) {
+    public ShopResponse(String shopName, String introduction, BusinessHours businessHours, Address address, List<DayOfWeek> openDays, int minOrderPrice) {
         this.shopName = shopName;
         this.introduction = introduction;
         this.businessHours = businessHours;
         this.address = address;
         this.openDays = openDays;
         this.minOrderPrice = minOrderPrice;
-        this.menus = menus;
     }
 }
