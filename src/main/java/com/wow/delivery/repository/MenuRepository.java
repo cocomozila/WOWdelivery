@@ -15,7 +15,7 @@ public interface MenuRepository extends CustomJpaRepository<Menu, Long> {
          WHERE m.shopId = :shopId
          ORDER BY m.menuOrder ASC
     """)
-    List<Menu> findAllByIdOrderByMenuOrder(@Param("shopId") Long shopId);
+    List<Menu> findAllByShopIdOrderByOrder(@Param("shopId") Long shopId);
 
     List<Menu> findByIdIn(List<Long> menuIds);
 }

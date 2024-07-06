@@ -36,17 +36,18 @@ public class MenuService {
             .name(menuCreateForm.getName())
             .introduction(menuCreateForm.getIntroduction())
             .price(menuCreateForm.getPrice())
-            .imagePath(imageService.getImagePath(menuCreateForm.getFile(), menuCreateForm.getX(), menuCreateForm.getY(), menuCreateForm.getLength()))
             .isSelling(menuCreateForm.isSelling())
             .build();
         Menu saveMenu = menuRepository.save(menu);
         saveMenu.createMenuOrder();
+        saveMenu.setImagePath(imageService.getImagePath(saveMenu.getClass().getSimpleName(), saveMenu.getIdOrThrow(),
+            menuCreateForm.getFile(), menuCreateForm.getX(), menuCreateForm.getY(), menuCreateForm.getLength()));
     }
 
     @Transactional(readOnly = true)
     public List<MenuResponse> getMenus(Long shopId) {
         Shop shop = shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
-        List<Menu> answer = menuRepository.findAllByIdOrderByMenuOrder(shop.getIdOrThrow());
+        List<Menu> answer = menuRepository.findAllByShopIdOrderByOrder(shop.getIdOrThrow());
         return answer.stream()
             .map(menu -> MenuResponse.builder()
                 .menuId(menu.getIdOrThrow())
@@ -68,7 +69,7 @@ public class MenuService {
             menuUpdateForm.getName(),
             menuUpdateForm.getIntroduction(),
             menuUpdateForm.getPrice(),
-            imageService.getImagePath(menuUpdateForm.getFile(), menuUpdateForm.getX(), menuUpdateForm.getY(), menuUpdateForm.getLength()),
+            imageService.getImagePath(menu.getClass().getSimpleName(), menu.getIdOrThrow(), menuUpdateForm.getFile(), menuUpdateForm.getX(), menuUpdateForm.getY(), menuUpdateForm.getLength()),
             menuUpdateForm.isSelling()
         );
     }

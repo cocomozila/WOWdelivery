@@ -104,11 +104,11 @@ class MenuServiceTest {
                 .name("양념치킨")
                 .introduction("맛있는 양념치킨!")
                 .price(17000)
-                .imagePath("image.jpg")
                 .isSelling(true)
                 .build();
 
             menu.setId(1L);
+            menu.setImagePath("image.jpg");
 
             given(shopRepository.findById(any()))
                 .willReturn(Optional.of(shop));
@@ -164,15 +164,16 @@ class MenuServiceTest {
                 .name("양념치킨")
                 .introduction("맛있는 양념치킨!")
                 .price(17000)
-                .imagePath("image.jpg")
                 .isSelling(true)
                 .build();
 
             menu.setId(1L);
+            menu.setImagePath("image.jpg");
+
 
             given(shopRepository.findById(any()))
                 .willReturn(Optional.of(shop));
-            given(menuRepository.findAllByIdOrderByMenuOrder(any()))
+            given(menuRepository.findAllByShopIdOrderByOrder(any()))
                 .willReturn(List.of(menu));
 
             // when
@@ -196,9 +197,11 @@ class MenuServiceTest {
                 .name("양념치킨")
                 .introduction("맛있는 양념치킨!")
                 .price(17000)
-                .imagePath("image.jpg")
                 .isSelling(true)
                 .build();
+
+            menu.setId(1L);
+            menu.setImagePath("image.jpg");
 
             MultipartFile file = new MockMultipartFile(
                 "chicken",
@@ -244,12 +247,12 @@ class MenuServiceTest {
                 .name("양념치킨")
                 .introduction("맛있는 양념치킨!")
                 .price(17000)
-                .imagePath("image.jpg")
                 .isSelling(true)
                 .build();
 
             menu1.setId(1L);
             menu1.createMenuOrder();
+            menu1.setImagePath("image.jpg");
 
             Menu menu2 = Menu.builder()
                 .shopId(1L)
@@ -257,12 +260,12 @@ class MenuServiceTest {
                 .name("순살치킨")
                 .introduction("맛있는 순살치킨!")
                 .price(15000)
-                .imagePath("image1.jpg")
                 .isSelling(true)
                 .build();
 
             menu2.setId(2L);
             menu2.createMenuOrder();
+            menu2.setImagePath("image.jpg");
 
             Menu menu3 = Menu.builder()
                 .shopId(1L)
@@ -270,12 +273,12 @@ class MenuServiceTest {
                 .name("바삭한치킨")
                 .introduction("바삭바삭 치킨!")
                 .price(18000)
-                .imagePath("image2.jpg")
                 .isSelling(true)
                 .build();
 
             menu3.setId(3L);
             menu3.createMenuOrder();
+            menu3.setImagePath("image.jpg");
 
             List<Long> beforeMenuIds = List.of(1L, 2L, 3L);
             List<Long> afterMenuIds = List.of(2L, 3L, 1L);
