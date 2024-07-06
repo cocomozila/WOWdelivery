@@ -19,13 +19,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.UUID;
 
 @Service
 public class ImageService {
 
     private static final String IMAGE_DIRECTORY = "C:\\Users\\josey\\Desktop\\mentoring\\wowbd\\images\\";
     private static final long MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+    private static final String DEFAULT_IMAGE = "default.jpg";
 
     /**
      * 이미지 파일을 지정된 좌표와 크기로 잘라 정방형으로 변환하여 저장하고, 파일명을 반환한다.
@@ -36,16 +36,19 @@ public class ImageService {
      * @param length 자를 한 변의 길이(정사각형)
      * @return 저장된 파일의 고유 파일명
      */
-    public String getImagePath(MultipartFile file, int x, int y, int length) {
-        return saveFile(file, x, y, length);
+    public String getImagePath(String className, Long id, MultipartFile file, int x, int y, int length) {
+        if (file.isEmpty()) {
+            return DEFAULT_IMAGE;
+        }
+        return saveFile(className, id, file, x, y, length);
     }
 
-    private String saveFile(MultipartFile file, int x, int y, int length) {
+    private String saveFile(String className, Long id, MultipartFile file, int x, int y, int length) {
         validateFile(file);
 
         try {
             String extension = getFileExtension(file);
-            String uniqueFilename = generateUniqueFilename(extension);
+            String uniqueFilename = generateFilename(className, id, extension);
 
             Path directoryPath = Paths.get(IMAGE_DIRECTORY);
             if (!Files.exists(directoryPath)) {
@@ -54,7 +57,7 @@ public class ImageService {
 
             Path filePath = directoryPath.resolve(uniqueFilename);
             while (Files.exists(filePath)) {
-                uniqueFilename = generateUniqueFilename(extension);
+                uniqueFilename = generateFilename(className, id, extension);
                 filePath = directoryPath.resolve(uniqueFilename);
             }
 
@@ -67,9 +70,6 @@ public class ImageService {
     }
 
     private void validateFile(MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new FileException(ErrorCode.FILE_ERROR, "파일이 비어있습니다.");
-        }
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new FileException(ErrorCode.FILE_ERROR, "파일 크기가 제한을 초과했습니다.");
         }
@@ -84,8 +84,8 @@ public class ImageService {
         return StringUtils.getFilenameExtension(originalFilename);
     }
 
-    private String generateUniqueFilename(String extension) {
-        return UUID.randomUUID().toString() + (extension != null ? "." + extension : "");
+    private String generateFilename(String className, Long id, String extension) {
+        return className + id + (extension != null ? "." + extension : "");
     }
 
     private void cropAndSaveImage(MultipartFile file, Path filePath, int x, int y, int length) throws IOException {

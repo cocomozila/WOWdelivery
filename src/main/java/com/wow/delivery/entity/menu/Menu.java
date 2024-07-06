@@ -33,8 +33,9 @@ public class Menu extends BaseEntity {
     @Column(name = "price", columnDefinition = "INTEGER", nullable = false)
     private int price;
 
+    @Setter
     @Comment(value = "메뉴 이미지 경로")
-    @Column(name = "image_path", columnDefinition = "VARCHAR(255)", nullable = false)
+    @Column(name = "image_path", columnDefinition = "VARCHAR(255)")
     private String imagePath;
 
     @Comment(value = "판매 상태")
@@ -47,13 +48,12 @@ public class Menu extends BaseEntity {
     private int menuOrder;
 
     @Builder
-    public Menu(Long shopId, Long menuCategoryId, String name, String introduction, int price, String imagePath, boolean isSelling) {
+    public Menu(Long shopId, Long menuCategoryId, String name, String introduction, int price, boolean isSelling) {
         this.shopId = shopId;
         this.menuCategoryId = menuCategoryId;
         this.name = name;
         this.introduction = introduction;
         this.price = price;
-        this.imagePath = imagePath;
         this.isSelling = isSelling;
     }
 
