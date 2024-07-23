@@ -1,10 +1,10 @@
 package com.wow.delivery.repository;
 
-import com.wow.delivery.entity.DeliveryAddress;
+import com.wow.delivery.entity.DeliveryAddressEntity;
 
 import java.util.List;
 
-public interface AddressRepository extends CustomJpaRepository<DeliveryAddress, Long> {
+public interface AddressRepository extends CustomJpaRepository<DeliveryAddressEntity, Long> {
 
-    List<DeliveryAddress> findAllByUserId(Long userId);
+    List<DeliveryAddressEntity> findAllByUserId(Long userId);
 }

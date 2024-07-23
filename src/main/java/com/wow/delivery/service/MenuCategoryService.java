@@ -4,8 +4,8 @@ import com.wow.delivery.dto.menu.category.MenuCategoryCreateDTO;
 import com.wow.delivery.dto.menu.category.MenuCategoryOrderUpdateDTO;
 import com.wow.delivery.dto.menu.category.MenuCategoryResponse;
 import com.wow.delivery.dto.menu.category.MenuCategoryUpdateDTO;
-import com.wow.delivery.entity.menu.MenuCategory;
-import com.wow.delivery.entity.shop.Shop;
+import com.wow.delivery.entity.menu.MenuCategoryEntity;
+import com.wow.delivery.entity.shop.ShopEntity;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.repository.MenuCategoryRepository;
@@ -29,19 +29,19 @@ public class MenuCategoryService {
 
     @Transactional
     public void createMenuCategory(MenuCategoryCreateDTO createDTO) {
-        Shop shop = shopService.findByShopIdOrThrow(createDTO.getShopId());
-        MenuCategory menuCategory = MenuCategory.builder()
-            .shopId(shop.getIdOrThrow())
+        ShopEntity shopEntity = shopService.findByShopIdOrThrow(createDTO.getShopId());
+        MenuCategoryEntity menuCategoryEntity = MenuCategoryEntity.builder()
+            .shopId(shopEntity.getIdOrThrow())
             .name(createDTO.getName())
             .build();
-        MenuCategory saveMenuCategory = menuCategoryRepository.save(menuCategory);
-        saveMenuCategory.createCategoryOrder();
+        MenuCategoryEntity saveMenuCategoryEntity = menuCategoryRepository.save(menuCategoryEntity);
+        saveMenuCategoryEntity.createCategoryOrder();
     }
 
     @Transactional(readOnly = true)
     public List<MenuCategoryResponse> getMenuCategory(Long shopId) {
-        Shop shop = shopService.findByShopIdOrThrow(shopId);
-        return menuCategoryRepository.findAllByShopId(shop.getIdOrThrow())
+        ShopEntity shopEntity = shopService.findByShopIdOrThrow(shopId);
+        return menuCategoryRepository.findAllByShopId(shopEntity.getIdOrThrow())
             .orElseThrow(() -> new DataNotFoundException(ErrorCode.MENU_CATEGORY_NOT_FOUND, "메뉴 카테고리가 존재하지 않습니다."))
             .stream()
             .map(mc -> MenuCategoryResponse.builder()
@@ -54,8 +54,8 @@ public class MenuCategoryService {
 
     @Transactional
     public void updateMenuCategory(MenuCategoryUpdateDTO updateDTO) {
-        MenuCategory menuCategory = menuCategoryRepository.findByIdOrThrow(updateDTO.getMenuCategoryId(), ErrorCode.MENU_CATEGORY_NOT_FOUND, null);
-        menuCategory.update(updateDTO.getName());
+        MenuCategoryEntity menuCategoryEntity = menuCategoryRepository.findByIdOrThrow(updateDTO.getMenuCategoryId(), ErrorCode.MENU_CATEGORY_NOT_FOUND, null);
+        menuCategoryEntity.update(updateDTO.getName());
     }
 
     @Transactional
@@ -63,10 +63,10 @@ public class MenuCategoryService {
         List<Long> beforeIds = updateDTO.getBeforeIds();
         List<Long> afterIds = updateDTO.getAfterIds();
 
-        List<MenuCategory> menuCategories = menuCategoryRepository.findByIdIn(beforeIds);
+        List<MenuCategoryEntity> menuCategories = menuCategoryRepository.findByIdIn(beforeIds);
 
-        Map<Long, MenuCategory> menuCategoryMap = menuCategories.stream()
-            .collect(Collectors.toMap(MenuCategory::getId, mc -> mc));
+        Map<Long, MenuCategoryEntity> menuCategoryMap = menuCategories.stream()
+            .collect(Collectors.toMap(MenuCategoryEntity::getId, mc -> mc));
 
         List<Integer> sortedMenuCategoriesOrders = beforeIds.stream()
             .map(id -> menuCategoryMap.get(id).getMenuCategoryOrder())
@@ -75,8 +75,8 @@ public class MenuCategoryService {
         IntStream.range(0, updateDTO.getSize())
             .filter(i -> !beforeIds.get(i).equals(afterIds.get(i)))
             .forEach(i -> {
-                MenuCategory menuCategory = menuCategoryMap.get(afterIds.get(i));
-                menuCategory.setMenuCategoryOrder(sortedMenuCategoriesOrders.get(i));
+                MenuCategoryEntity menuCategoryEntity = menuCategoryMap.get(afterIds.get(i));
+                menuCategoryEntity.setMenuCategoryOrder(sortedMenuCategoriesOrders.get(i));
             });
     }
 }

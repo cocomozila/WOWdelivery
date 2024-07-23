@@ -4,8 +4,8 @@ import com.wow.delivery.dto.address.AddressCreateDTO;
 import com.wow.delivery.dto.address.AddressRequestDTO;
 import com.wow.delivery.dto.address.AddressResponse;
 import com.wow.delivery.dto.address.AddressUpdateDTO;
-import com.wow.delivery.entity.DeliveryAddress;
-import com.wow.delivery.entity.User;
+import com.wow.delivery.entity.DeliveryAddressEntity;
+import com.wow.delivery.entity.UserEntity;
 import com.wow.delivery.entity.common.Address;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.repository.AddressRepository;
@@ -26,9 +26,9 @@ public class DeliveryAddressService {
     @Transactional
     public void createDeliveryAddress(AddressCreateDTO addressCreateDTO) {
         Long userId = addressCreateDTO.getUserId();
-        User user = userRepository.findByIdOrThrow(userId, ErrorCode.USER_DATA_NOT_FOUND, null);
-        DeliveryAddress deliveryAddress = DeliveryAddress.builder()
-            .userId(user.getIdOrThrow())
+        UserEntity userEntity = userRepository.findByIdOrThrow(userId, ErrorCode.USER_DATA_NOT_FOUND, null);
+        DeliveryAddressEntity deliveryAddressEntity = DeliveryAddressEntity.builder()
+            .userId(userEntity.getIdOrThrow())
             .addressAlias(addressCreateDTO.getAddressAlias())
             .address(Address.builder()
                 .state(addressCreateDTO.getState())
@@ -41,25 +41,25 @@ public class DeliveryAddressService {
                 .longitude(addressCreateDTO.getLongitude())
                 .build())
             .build();
-        addressRepository.save(deliveryAddress);
+        addressRepository.save(deliveryAddressEntity);
     }
 
     @Transactional(readOnly = true)
     public List<AddressResponse> getAddresses(AddressRequestDTO addressRequestDTO) {
-        User user = userRepository.findByIdOrThrow(addressRequestDTO.getUserId(), ErrorCode.USER_DATA_NOT_FOUND, null);
-        List<DeliveryAddress> deliveryAddresses = addressRepository.findAllByUserId(user.getIdOrThrow());
-        return deliveryAddresses.stream()
-            .map(deliveryAddress -> new AddressResponse(
-                deliveryAddress.getIdOrThrow(),
-                deliveryAddress.getAddressAlias(),
-                deliveryAddress.getAddress()))
+        UserEntity userEntity = userRepository.findByIdOrThrow(addressRequestDTO.getUserId(), ErrorCode.USER_DATA_NOT_FOUND, null);
+        List<DeliveryAddressEntity> deliveryAddressEntities = addressRepository.findAllByUserId(userEntity.getIdOrThrow());
+        return deliveryAddressEntities.stream()
+            .map(deliveryAddressEntity -> new AddressResponse(
+                deliveryAddressEntity.getIdOrThrow(),
+                deliveryAddressEntity.getAddressAlias(),
+                deliveryAddressEntity.getAddress()))
             .toList();
     }
 
     @Transactional
     public void updateAddress(AddressUpdateDTO addressUpdateDTO) {
-        DeliveryAddress deliveryAddress = addressRepository.findByIdOrThrow(addressUpdateDTO.getAddressId(), ErrorCode.ADDRESS_DATA_NOT_FOUND, null);
-        deliveryAddress.update(
+        DeliveryAddressEntity deliveryAddressEntity = addressRepository.findByIdOrThrow(addressUpdateDTO.getAddressId(), ErrorCode.ADDRESS_DATA_NOT_FOUND, null);
+        deliveryAddressEntity.update(
             addressUpdateDTO.getAddressAlias(),
             Address.builder()
                 .state(addressUpdateDTO.getState())

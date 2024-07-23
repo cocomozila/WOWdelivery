@@ -1,11 +1,11 @@
 package com.wow.delivery.repository;
 
-import com.wow.delivery.entity.shop.MetaCategory;
+import com.wow.delivery.entity.shop.MetaCategoryEntity;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface MetaCategoryRepository extends CustomJpaRepository<MetaCategory, Long> {
+public interface MetaCategoryRepository extends CustomJpaRepository<MetaCategoryEntity, Long> {
 
-    List<MetaCategory> findAllByCategoryNameIn(@Param("categoryNames") List<String> categoryNames);
+    List<MetaCategoryEntity> findAllByCategoryNameIn(@Param("categoryNames") List<String> categoryNames);
 }
