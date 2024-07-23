@@ -2,6 +2,7 @@ package com.wow.delivery.entity.shop;
 
 import com.wow.delivery.entity.BaseEntity;
 import com.wow.delivery.entity.common.Address;
+import com.wow.delivery.util.SnowFlakeGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -18,7 +19,10 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Shop extends BaseEntity {
+public class ShopEntity extends BaseEntity {
+
+    @Column(name = "public_id") // 가게 고유 번호 uuid w-12sf113
+    private String publicId;
 
     @Column(name = "owner_id")
     private Long ownerId;
@@ -45,11 +49,16 @@ public class Shop extends BaseEntity {
     @Column(name = "min_order_price", columnDefinition = "INT")
     private int minOrderPrice;
 
+    @Comment(value = "배달비")
+    @Column(name = "delivery_fee", columnDefinition = "INT")
+    private int deliveryFee;
+
     @Embedded
     private S2LevelToken s2LevelToken;
 
     @Builder
-    public Shop(Long ownerId, String shopName, String introduction, BusinessHours businessHours, Address address, List<DayOfWeek> openDays, int minOrderPrice, S2LevelToken s2LevelToken) {
+    public ShopEntity(Long ownerId, String shopName, String introduction, BusinessHours businessHours, Address address, List<DayOfWeek> openDays, int minOrderPrice, int deliveryFee, S2LevelToken s2LevelToken) {
+        this.publicId = SnowFlakeGenerator.generateBase36String();
         this.ownerId = ownerId;
         this.shopName = shopName;
         this.introduction = introduction;
@@ -57,16 +66,18 @@ public class Shop extends BaseEntity {
         this.address = address;
         this.openDays = openDays;
         this.minOrderPrice = minOrderPrice;
+        this.deliveryFee = deliveryFee;
         this.s2LevelToken = s2LevelToken;
     }
 
-    public void update(String shopName, String introduction, BusinessHours businessHours, Address address, List<DayOfWeek> openDays, int minOrderPrice, S2LevelToken s2LevelToken) {
+    public void update(String shopName, String introduction, BusinessHours businessHours, Address address, List<DayOfWeek> openDays, int minOrderPrice, int deliveryFee, S2LevelToken s2LevelToken) {
         this.shopName = shopName;
         this.introduction = introduction;
         this.businessHours = businessHours;
         this.address = address;
         this.openDays = openDays;
         this.minOrderPrice = minOrderPrice;
+        this.deliveryFee = deliveryFee;
         this.s2LevelToken = s2LevelToken;
     }
 }

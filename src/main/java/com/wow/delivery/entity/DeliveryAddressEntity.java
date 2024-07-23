@@ -4,6 +4,7 @@ import com.wow.delivery.entity.common.Address;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class DeliveryAddress extends BaseEntity {
+@Table(name = "delivery_address")
+public class DeliveryAddressEntity extends BaseEntity {
 
     @Column(name = "user_id")
     private Long userId; // userId로 수정
@@ -23,7 +25,7 @@ public class DeliveryAddress extends BaseEntity {
     private Address address;
 
     @Builder
-    public DeliveryAddress(Long userId, String addressAlias, Address address) {
+    public DeliveryAddressEntity(Long userId, String addressAlias, Address address) {
         this.userId = userId;
         this.addressAlias = addressAlias;
         this.address = address;

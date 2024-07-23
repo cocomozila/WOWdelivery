@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(uniqueConstraints = { @UniqueConstraint(name = "email_phoneNumber_unique", columnNames = { "email", "phone_number" }) })
-public class Owner extends BaseEntity {
+@Table(name = "user", uniqueConstraints = { @UniqueConstraint(name = "email_phoneNumber_unique", columnNames = { "email", "phone_number" }) })
+public class UserEntity extends BaseEntity {
 
     @Column(name = "email", columnDefinition = "VARCHAR(30)", nullable = false)
     private String email;
@@ -27,7 +27,7 @@ public class Owner extends BaseEntity {
     private String phoneNumber;
 
     @Builder
-    public Owner(String email, String password, String salt, String phoneNumber) {
+    public UserEntity(String email, String password, String salt, String phoneNumber) {
         this.email = email;
         this.password = password;
         this.salt = salt;

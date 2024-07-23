@@ -3,7 +3,7 @@ package com.wow.delivery.service;
 import com.wow.delivery.dto.common.PasswordEncodingDTO;
 import com.wow.delivery.dto.owner.OwnerSigninDTO;
 import com.wow.delivery.dto.owner.OwnerSignupDTO;
-import com.wow.delivery.entity.Owner;
+import com.wow.delivery.entity.OwnerEntity;
 import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.InvalidParameterException;
 import com.wow.delivery.repository.OwnerRepository;
@@ -128,14 +128,14 @@ public class OwnerServiceTest {
             PasswordEncodingDTO passwordEncoder =
                 PasswordEncoder.encodePassword(signupOwner.getPassword());
 
-            Owner owner = Owner.builder()
+            OwnerEntity ownerEntity = OwnerEntity.builder()
                 .email(signupOwner.getEmail())
                 .password(passwordEncoder.getEncodePassword())
                 .salt(passwordEncoder.getSalt())
                 .phoneNumber(signupOwner.getPhoneNumber())
                 .build();
 
-            owner.setId(1L);
+            ownerEntity.setId(1L);
 
             OwnerSigninDTO signinDTO = OwnerSigninDTO.builder()
                 .email("test@gmail.com")
@@ -145,7 +145,7 @@ public class OwnerServiceTest {
             HttpSession session = mock(HttpSession.class);
 
             given(ownerRepository.findUserByEmail(signinDTO.getEmail()))
-                .willReturn(Optional.of(owner));
+                .willReturn(Optional.of(ownerEntity));
 
             // when
             ownerService.signin(signinDTO, session);
@@ -190,7 +190,7 @@ public class OwnerServiceTest {
             PasswordEncodingDTO passwordEncoder =
                 PasswordEncoder.encodePassword(password);
 
-            Owner owner = Owner.builder()
+            OwnerEntity ownerEntity = OwnerEntity.builder()
                 .email("seyun@gmail.com")
                 .password(passwordEncoder.getEncodePassword())
                 .salt(passwordEncoder.getSalt())
@@ -200,7 +200,7 @@ public class OwnerServiceTest {
             HttpSession session = mock(HttpSession.class);
 
             given(ownerRepository.findUserByEmail(faliSigninDTO.getEmail()))
-                .willReturn(Optional.of(owner));
+                .willReturn(Optional.of(ownerEntity));
 
             // when & then
             assertThatThrownBy(() -> ownerService.signin(faliSigninDTO, session))
@@ -217,7 +217,7 @@ public class OwnerServiceTest {
             PasswordEncodingDTO passwordEncoder =
                 PasswordEncoder.encodePassword(password);
 
-            Owner owner = Owner.builder()
+            OwnerEntity ownerEntity = OwnerEntity.builder()
                 .email("seyun@gmail.com")
                 .password(passwordEncoder.getEncodePassword())
                 .salt(passwordEncoder.getSalt())
@@ -226,7 +226,7 @@ public class OwnerServiceTest {
 
             String uuid = UUID.randomUUID().toString();
             HttpSession session = spy(HttpSession.class);
-            session.setAttribute(uuid, owner);
+            session.setAttribute(uuid, ownerEntity);
 
             // when
             ownerService.logout(session);

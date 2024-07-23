@@ -29,6 +29,9 @@ public class ShopUpdateDTO {
     @Min(0)
     private int minOrderPrice; // 최소 주문 금액
 
+    @Min(0)
+    private int deliveryFee; // 배달비
+
     private String state; // 주소(도)
 
     private String city; // 주소(시)
@@ -46,7 +49,7 @@ public class ShopUpdateDTO {
     private Double longitude; // y좌표
 
     @Builder
-    public ShopUpdateDTO(Long shopId, List<String> categoryNames, String shopName, String introduction, List<DayOfWeek> openDays, String openTime, String closeTime, int minOrderPrice, String state, String city, String district, String streetName, String buildingNumber, String addressDetail, Double latitude, Double longitude) {
+    public ShopUpdateDTO(Long shopId, List<String> categoryNames, String shopName, String introduction, List<DayOfWeek> openDays, String openTime, String closeTime, int minOrderPrice, int deliveryFee, String state, String city, String district, String streetName, String buildingNumber, String addressDetail, Double latitude, Double longitude) {
         this.shopId = shopId;
         this.categoryNames = categoryNames;
         this.shopName = shopName;
@@ -55,6 +58,7 @@ public class ShopUpdateDTO {
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.minOrderPrice = minOrderPrice;
+        this.deliveryFee = deliveryFee;
         this.state = state;
         this.city = city;
         this.district = district;

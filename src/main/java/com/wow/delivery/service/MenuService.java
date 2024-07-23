@@ -4,8 +4,8 @@ import com.wow.delivery.dto.menu.MenuCreateForm;
 import com.wow.delivery.dto.menu.MenuOrderUpdateDTO;
 import com.wow.delivery.dto.menu.MenuResponse;
 import com.wow.delivery.dto.menu.MenuUpdateForm;
-import com.wow.delivery.entity.menu.Menu;
-import com.wow.delivery.entity.shop.Shop;
+import com.wow.delivery.entity.menu.MenuEntity;
+import com.wow.delivery.entity.shop.ShopEntity;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.repository.MenuRepository;
 import com.wow.delivery.repository.ShopRepository;
@@ -28,48 +28,48 @@ public class MenuService {
 
     @Transactional
     public void createMenu(MenuCreateForm menuCreateForm) {
-        Shop shop = shopRepository.findByIdOrThrow(menuCreateForm.getShopId(), ErrorCode.SHOP_DATA_NOT_FOUND, null);
+        ShopEntity shopEntity = shopRepository.findByIdOrThrow(menuCreateForm.getShopId(), ErrorCode.SHOP_DATA_NOT_FOUND, null);
 
-        Menu menu = Menu.builder()
-            .shopId(shop.getIdOrThrow())
+        MenuEntity menuEntity = MenuEntity.builder()
+            .shopId(shopEntity.getIdOrThrow())
             .menuCategoryId(menuCreateForm.getMenuCategoryId())
             .name(menuCreateForm.getName())
             .introduction(menuCreateForm.getIntroduction())
             .price(menuCreateForm.getPrice())
             .isSelling(menuCreateForm.isSelling())
             .build();
-        Menu saveMenu = menuRepository.save(menu);
-        saveMenu.createMenuOrder();
-        saveMenu.setImagePath(imageService.getImagePath(saveMenu.getClass().getSimpleName(), saveMenu.getIdOrThrow(),
+        MenuEntity saveMenuEntity = menuRepository.save(menuEntity);
+        saveMenuEntity.createMenuOrder();
+        saveMenuEntity.setImagePath(imageService.getImagePath(saveMenuEntity.getClass().getSimpleName(), saveMenuEntity.getIdOrThrow(),
             menuCreateForm.getFile(), menuCreateForm.getX(), menuCreateForm.getY(), menuCreateForm.getLength()));
     }
 
     @Transactional(readOnly = true)
     public List<MenuResponse> getMenus(Long shopId) {
-        Shop shop = shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
-        List<Menu> answer = menuRepository.findAllByShopIdOrderByOrder(shop.getIdOrThrow());
+        ShopEntity shopEntity = shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
+        List<MenuEntity> answer = menuRepository.findAllByShopIdOrderByOrder(shopEntity.getIdOrThrow());
         return answer.stream()
-            .map(menu -> MenuResponse.builder()
-                .menuId(menu.getIdOrThrow())
-                .menuCategoryId(menu.getMenuCategoryId())
-                .name(menu.getName())
-                .introduction(menu.getIntroduction())
-                .price(menu.getPrice())
-                .imagePath(menu.getImagePath())
-                .menuOrder(menu.getMenuOrder())
+            .map(menuEntity -> MenuResponse.builder()
+                .menuId(menuEntity.getIdOrThrow())
+                .menuCategoryId(menuEntity.getMenuCategoryId())
+                .name(menuEntity.getName())
+                .introduction(menuEntity.getIntroduction())
+                .price(menuEntity.getPrice())
+                .imagePath(menuEntity.getImagePath())
+                .menuOrder(menuEntity.getMenuOrder())
                 .build())
             .toList();
     }
 
     @Transactional
     public void update(MenuUpdateForm menuUpdateForm) {
-        Menu menu = menuRepository.findByIdOrThrow(menuUpdateForm.getMenuId(), ErrorCode.MENU_DATA_NOT_FOUND, null);
-        menu.update(
+        MenuEntity menuEntity = menuRepository.findByIdOrThrow(menuUpdateForm.getMenuId(), ErrorCode.MENU_DATA_NOT_FOUND, null);
+        menuEntity.update(
             menuUpdateForm.getMenuCategoryId(),
             menuUpdateForm.getName(),
             menuUpdateForm.getIntroduction(),
             menuUpdateForm.getPrice(),
-            imageService.getImagePath(menu.getClass().getSimpleName(), menu.getIdOrThrow(), menuUpdateForm.getFile(), menuUpdateForm.getX(), menuUpdateForm.getY(), menuUpdateForm.getLength()),
+            imageService.getImagePath(menuEntity.getClass().getSimpleName(), menuEntity.getIdOrThrow(), menuUpdateForm.getFile(), menuUpdateForm.getX(), menuUpdateForm.getY(), menuUpdateForm.getLength()),
             menuUpdateForm.isSelling()
         );
     }
@@ -79,10 +79,10 @@ public class MenuService {
         List<Long> beforeMenuIds = updateDTO.getBeforeMenuIds();
         List<Long> afterMenuIds = updateDTO.getAfterMenuIds();
 
-        List<Menu> menus = menuRepository.findByIdIn(beforeMenuIds);
+        List<MenuEntity> menuEntities = menuRepository.findByIdIn(beforeMenuIds);
 
-        Map<Long, Menu> menuMap = menus.stream()
-            .collect(Collectors.toMap(Menu::getId, menu -> menu));
+        Map<Long, MenuEntity> menuMap = menuEntities.stream()
+            .collect(Collectors.toMap(MenuEntity::getId, menuEntity -> menuEntity));
 
         List<Integer> sortedMenuOrders = beforeMenuIds.stream()
             .map(id -> menuMap.get(id).getMenuOrder())
@@ -91,8 +91,8 @@ public class MenuService {
         IntStream.range(0, updateDTO.getSize())
             .filter(i -> !beforeMenuIds.get(i).equals(afterMenuIds.get(i)))
             .forEach(i -> {
-                Menu menu = menuMap.get(afterMenuIds.get(i));
-                menu.setMenuOrder(sortedMenuOrders.get(i));
+                MenuEntity menuEntity = menuMap.get(afterMenuIds.get(i));
+                menuEntity.setMenuOrder(sortedMenuOrders.get(i));
             });
     }
 }

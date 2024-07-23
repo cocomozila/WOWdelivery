@@ -11,14 +11,14 @@ import org.hibernate.annotations.Comment;
 @Entity
 @Getter
 @NoArgsConstructor
-public class MetaCategory extends BaseEntity {
+public class MetaCategoryEntity extends BaseEntity {
 
     @Comment(value = "카테고리 명")
     @Column(name = "category_name")
     private String categoryName;
 
     @Builder
-    public MetaCategory(String categoryName) {
+    public MetaCategoryEntity(String categoryName) {
         this.categoryName = categoryName;
     }
 }

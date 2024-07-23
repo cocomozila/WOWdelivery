@@ -29,6 +29,9 @@ public class ShopCreateDTO {
     @Min(0)
     private int minOrderPrice; // 최소 주문 금액
 
+    @Min(0)
+    private int deliveryFee; // 배달비
+
     private String state; // 주소(도)
 
     private String city; // 주소(시)

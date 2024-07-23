@@ -4,8 +4,8 @@ import com.wow.delivery.dto.address.AddressCreateDTO;
 import com.wow.delivery.dto.address.AddressRequestDTO;
 import com.wow.delivery.dto.address.AddressResponse;
 import com.wow.delivery.dto.address.AddressUpdateDTO;
-import com.wow.delivery.entity.DeliveryAddress;
-import com.wow.delivery.entity.User;
+import com.wow.delivery.entity.DeliveryAddressEntity;
+import com.wow.delivery.entity.UserEntity;
 import com.wow.delivery.entity.common.Address;
 import com.wow.delivery.repository.AddressRepository;
 import com.wow.delivery.repository.UserRepository;
@@ -41,7 +41,7 @@ class DeliveryAddressServiceTest {
 
     @Nested
     @DisplayName("주소 등록")
-    class CreateDeliveryAddress {
+    class CreateDeliveryAddressEntity {
 
         @Test
         @DisplayName("성공")
@@ -60,16 +60,16 @@ class DeliveryAddressServiceTest {
                 .longitude(37.6639380)
                 .build();
 
-            User user = User.builder()
+            UserEntity userEntity = UserEntity.builder()
                 .email("abcd@gmail.com")
                 .password("12345678")
                 .salt("abcd1234")
                 .phoneNumber("01011112222")
                 .build();
 
-            user.setId(1L);
+            userEntity.setId(1L);
 
-            given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+            given(userRepository.findById(anyLong())).willReturn(Optional.of(userEntity));
 
             // when
             deliveryAddressService.createDeliveryAddress(addressCreateDTO);
@@ -83,22 +83,22 @@ class DeliveryAddressServiceTest {
 
     @Nested
     @DisplayName("주소 조회")
-    class FindDeliveryAddress {
+    class FindDeliveryAddressEntity {
 
         @Test
         @DisplayName("성공")
         void success_findAddress() {
             // given
-            User user = User.builder()
+            UserEntity userEntity = UserEntity.builder()
                 .email("abcd@gmail.com")
                 .password("12345678")
                 .salt("abcd1234")
                 .phoneNumber("01011112222")
                 .build();
 
-            user.setId(1L);
+            userEntity.setId(1L);
 
-            DeliveryAddress deliveryAddress1 = DeliveryAddress.builder()
+            DeliveryAddressEntity deliveryAddressEntity1 = DeliveryAddressEntity.builder()
                 .userId(1L)
                 .addressAlias("우리집")
                 .address(Address.builder()
@@ -113,9 +113,9 @@ class DeliveryAddressServiceTest {
                     .build())
                 .build();
 
-            deliveryAddress1.setId(1L);
+            deliveryAddressEntity1.setId(1L);
 
-            DeliveryAddress deliveryAddress2 = DeliveryAddress.builder()
+            DeliveryAddressEntity deliveryAddressEntity2 = DeliveryAddressEntity.builder()
                 .userId(1L)
                 .addressAlias("사무실")
                 .address(Address.builder()
@@ -130,14 +130,14 @@ class DeliveryAddressServiceTest {
                     .build())
                 .build();
 
-            deliveryAddress2.setId(2L);
+            deliveryAddressEntity2.setId(2L);
 
             AddressRequestDTO addressRequestDTO = AddressRequestDTO.builder()
-                .userId(user.getIdOrThrow())
+                .userId(userEntity.getIdOrThrow())
                 .build();
 
-            given(userRepository.findById(user.getIdOrThrow())).willReturn(Optional.of(user));
-            given(addressRepository.findAllByUserId(any())).willReturn(List.of(deliveryAddress1, deliveryAddress2));
+            given(userRepository.findById(userEntity.getIdOrThrow())).willReturn(Optional.of(userEntity));
+            given(addressRepository.findAllByUserId(any())).willReturn(List.of(deliveryAddressEntity1, deliveryAddressEntity2));
 
             // when
             List<AddressResponse> addresses = deliveryAddressService.getAddresses(addressRequestDTO);
@@ -150,20 +150,20 @@ class DeliveryAddressServiceTest {
         @DisplayName("주소 0개 성공")
         void success_findAddress_zero() {
             // given
-            User user = User.builder()
+            UserEntity userEntity = UserEntity.builder()
                 .email("abcd@gmail.com")
                 .password("12345678")
                 .salt("abcd1234")
                 .phoneNumber("01011112222")
                 .build();
 
-            user.setId(1L);
+            userEntity.setId(1L);
 
             AddressRequestDTO addressRequestDTO = AddressRequestDTO.builder()
-                .userId(user.getIdOrThrow())
+                .userId(userEntity.getIdOrThrow())
                 .build();
 
-            given(userRepository.findById(user.getIdOrThrow())).willReturn(Optional.of(user));
+            given(userRepository.findById(userEntity.getIdOrThrow())).willReturn(Optional.of(userEntity));
             given(addressRepository.findAllByUserId(any())).willReturn(List.of());
 
             // when
@@ -176,13 +176,13 @@ class DeliveryAddressServiceTest {
 
     @Nested
     @DisplayName("주소 변경")
-    class UpdateDeliveryAddress {
+    class UpdateDeliveryAddressEntity {
 
         @Test
         @DisplayName("성공")
         void updateAddress() {
             // given
-            DeliveryAddress deliveryAddress1 = DeliveryAddress.builder()
+            DeliveryAddressEntity deliveryAddressEntity1 = DeliveryAddressEntity.builder()
                 .userId(1L)
                 .addressAlias("우리집")
                 .address(Address.builder()
@@ -210,16 +210,16 @@ class DeliveryAddressServiceTest {
                 .longitude(37.6639380)
                 .build();
 
-            given(addressRepository.findById(anyLong())).willReturn(Optional.of(deliveryAddress1));
+            given(addressRepository.findById(anyLong())).willReturn(Optional.of(deliveryAddressEntity1));
 
             // when
             deliveryAddressService.updateAddress(addressUpdateDTO);
 
             // then
-            Assertions.assertThat(deliveryAddress1.getAddressAlias()).isEqualTo("변경된 집");
-            Assertions.assertThat(deliveryAddress1.getAddress().getAddressDetail()).isEqualTo("111동 111호");
-            Assertions.assertThat(deliveryAddress1.getAddress().getLatitude()).isEqualTo(126.8338819);
-            Assertions.assertThat(deliveryAddress1.getAddress().getLongitude()).isEqualTo(37.6639380);
+            Assertions.assertThat(deliveryAddressEntity1.getAddressAlias()).isEqualTo("변경된 집");
+            Assertions.assertThat(deliveryAddressEntity1.getAddress().getAddressDetail()).isEqualTo("111동 111호");
+            Assertions.assertThat(deliveryAddressEntity1.getAddress().getLatitude()).isEqualTo(126.8338819);
+            Assertions.assertThat(deliveryAddressEntity1.getAddress().getLongitude()).isEqualTo(37.6639380);
         }
     }
 }

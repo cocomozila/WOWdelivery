@@ -4,7 +4,7 @@ import com.wow.delivery.dto.common.PasswordEncodingDTO;
 import com.wow.delivery.dto.owner.OwnerSigninDTO;
 import com.wow.delivery.dto.owner.OwnerSigninResponse;
 import com.wow.delivery.dto.owner.OwnerSignupDTO;
-import com.wow.delivery.entity.Owner;
+import com.wow.delivery.entity.OwnerEntity;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.InvalidParameterException;
@@ -28,24 +28,24 @@ public class OwnerService {
         validDuplicateUser(ownerSignupDTO);
         PasswordEncodingDTO passwordEncoder
             = PasswordEncoder.encodePassword(ownerSignupDTO.getPassword());
-        Owner owner = Owner.builder()
+        OwnerEntity ownerEntity = OwnerEntity.builder()
                 .email(ownerSignupDTO.getEmail())
                 .password(passwordEncoder.getEncodePassword())
                 .salt(passwordEncoder.getSalt())
                 .phoneNumber(ownerSignupDTO.getPhoneNumber())
                 .build();
-        ownerRepository.save(owner);
+        ownerRepository.save(ownerEntity);
     }
 
     @Transactional(readOnly = true)
     public OwnerSigninResponse signin(OwnerSigninDTO ownerSigninDTO, HttpSession session) {
-        Owner owner = ownerRepository.getByEmail(ownerSigninDTO.getEmail());
-        if (!PasswordEncoder.matchesPassword(ownerSigninDTO.getPassword(), owner.getPassword(), owner.getSalt())) {
+        OwnerEntity ownerEntity = ownerRepository.getByEmail(ownerSigninDTO.getEmail());
+        if (!PasswordEncoder.matchesPassword(ownerSigninDTO.getPassword(), ownerEntity.getPassword(), ownerEntity.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }
-        setSession(owner.getIdOrThrow(), session);
+        setSession(ownerEntity.getIdOrThrow(), session);
         return OwnerSigninResponse.builder()
-            .id(owner.getIdOrThrow())
+            .id(ownerEntity.getIdOrThrow())
             .build();
     }
 

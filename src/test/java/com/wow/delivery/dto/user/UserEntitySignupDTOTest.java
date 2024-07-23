@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-class UserSignupDTOTest {
+class UserEntitySignupDTOTest {
 
     @Autowired
     private MockMvc mockMvc;

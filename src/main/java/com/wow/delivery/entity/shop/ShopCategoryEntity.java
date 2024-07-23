@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class ShopCategory extends BaseEntity {
+public class ShopCategoryEntity extends BaseEntity {
 
     @Column(name = "shop_id")
     private Long shopId;
@@ -19,7 +19,7 @@ public class ShopCategory extends BaseEntity {
     private Long metaCategoryId;
 
     @Builder
-    public ShopCategory(Long shopId, Long metaCategoryId) {
+    public ShopCategoryEntity(Long shopId, Long metaCategoryId) {
         this.shopId = shopId;
         this.metaCategoryId = metaCategoryId;
     }

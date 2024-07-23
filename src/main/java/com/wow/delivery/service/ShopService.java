@@ -1,7 +1,7 @@
 package com.wow.delivery.service;
 
 import com.wow.delivery.dto.shop.*;
-import com.wow.delivery.entity.Owner;
+import com.wow.delivery.entity.OwnerEntity;
 import com.wow.delivery.entity.common.Address;
 import com.wow.delivery.entity.shop.*;
 import com.wow.delivery.error.ErrorCode;
@@ -29,10 +29,10 @@ public class ShopService {
     @Transactional
     public void createShop(ShopCreateDTO shopCreateDTO) {
         Long ownerId = shopCreateDTO.getOwnerId();
-        Owner owner = ownerRepository.findByIdOrThrow(ownerId, ErrorCode.OWNER_DATA_NOT_FOUND, null);
+        OwnerEntity ownerEntity = ownerRepository.findByIdOrThrow(ownerId, ErrorCode.OWNER_DATA_NOT_FOUND, null);
 
-        Shop shop = Shop.builder()
-            .ownerId(owner.getIdOrThrow())
+        ShopEntity shopEntity = ShopEntity.builder()
+            .ownerId(ownerEntity.getIdOrThrow())
             .shopName(shopCreateDTO.getShopName())
             .introduction(shopCreateDTO.getIntroduction())
             .businessHours(BusinessHours.builder()
@@ -51,12 +51,13 @@ public class ShopService {
                 .longitude(shopCreateDTO.getLongitude())
                 .build())
             .openDays(shopCreateDTO.getOpenDays())
+            .deliveryFee(shopCreateDTO.getDeliveryFee())
             .s2LevelToken(new S2LevelToken(shopCreateDTO.getLatitude(), shopCreateDTO.getLongitude()))
             .build();
 
-        shopRepository.save(shop);
+        shopRepository.save(shopEntity);
 
-        List<ShopCategory> shopCategories = buildShopCategories(shopCreateDTO.getCategoryNames(), shop.getId());
+        List<ShopCategoryEntity> shopCategories = buildShopCategories(shopCreateDTO.getCategoryNames(), shopEntity.getId());
         shopCategoryRepository.saveAll(shopCategories);
     }
 
@@ -80,10 +81,10 @@ public class ShopService {
             .toList();
     }
 
-    private <T> List<Shop> findShopsByDensity(NearbyShopRequestDTO requestDTO,
-                                              BiFunction<List<String>, T, List<Shop>> populatedAreaMethod,
-                                              BiFunction<List<String>, T, List<Shop>> nonPopulatedAreaMethod,
-                                              T searchParameter) {
+    private <T> List<ShopEntity> findShopsByDensity(NearbyShopRequestDTO requestDTO,
+                                                    BiFunction<List<String>, T, List<ShopEntity>> populatedAreaMethod,
+                                                    BiFunction<List<String>, T, List<ShopEntity>> nonPopulatedAreaMethod,
+                                                    T searchParameter) {
         if (s2Service.isPopulatedArea(requestDTO.getState())) {
             List<String> tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
             return populatedAreaMethod.apply(tokens, searchParameter);
@@ -94,9 +95,9 @@ public class ShopService {
 
     @Transactional
     public void updateShop(ShopUpdateDTO shopUpdateDTO) {
-        Shop shop = findByShopIdOrThrow(shopUpdateDTO.getShopId());
+        ShopEntity shopEntity = findByShopIdOrThrow(shopUpdateDTO.getShopId());
 
-        shop.update(
+        shopEntity.update(
             shopUpdateDTO.getShopName(),
             shopUpdateDTO.getIntroduction(),
             BusinessHours.builder()
@@ -115,35 +116,36 @@ public class ShopService {
                 .build(),
             shopUpdateDTO.getOpenDays(),
             shopUpdateDTO.getMinOrderPrice(),
+            shopUpdateDTO.getDeliveryFee(),
             new S2LevelToken(shopUpdateDTO.getLatitude(), shopUpdateDTO.getLongitude())
         );
     }
 
     @Transactional(readOnly = true)
     public ShopResponse getShop(Long shopId) {
-        Shop shop = findByShopIdOrThrow(shopId);
+        ShopEntity shopEntity = findByShopIdOrThrow(shopId);
 
         return ShopResponse.builder()
-            .shopName(shop.getShopName())
-            .introduction(shop.getIntroduction())
-            .businessHours(shop.getBusinessHours())
-            .address(shop.getAddress())
-            .openDays(shop.getOpenDays())
-            .minOrderPrice(shop.getMinOrderPrice())
+            .shopName(shopEntity.getShopName())
+            .introduction(shopEntity.getIntroduction())
+            .businessHours(shopEntity.getBusinessHours())
+            .address(shopEntity.getAddress())
+            .openDays(shopEntity.getOpenDays())
+            .minOrderPrice(shopEntity.getMinOrderPrice())
             .build();
     }
 
-    private List<ShopCategory> buildShopCategories(List<String> categoryNames, Long shopId) {
-        List<MetaCategory> allByCategoryName = metaCategoryRepository.findAllByCategoryNameIn(categoryNames);
+    private List<ShopCategoryEntity> buildShopCategories(List<String> categoryNames, Long shopId) {
+        List<MetaCategoryEntity> allByCategoryName = metaCategoryRepository.findAllByCategoryNameIn(categoryNames);
         return allByCategoryName.stream()
-            .map(m -> ShopCategory.builder()
+            .map(m -> ShopCategoryEntity.builder()
                 .shopId(shopId)
                 .metaCategoryId(m.getId())
                 .build())
             .toList();
     }
 
-    public Shop findByShopIdOrThrow(Long shopId) {
+    public ShopEntity findByShopIdOrThrow(Long shopId) {
         return shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
     }
 }

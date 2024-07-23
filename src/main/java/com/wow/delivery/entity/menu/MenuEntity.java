@@ -3,6 +3,7 @@ package com.wow.delivery.entity.menu;
 import com.wow.delivery.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,8 @@ import org.hibernate.annotations.Comment;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Menu extends BaseEntity {
+@Table(name = "menu")
+public class MenuEntity extends BaseEntity {
 
     @Column(name = "shop_id", nullable = false)
     private Long shopId;
@@ -48,7 +50,7 @@ public class Menu extends BaseEntity {
     private int menuOrder;
 
     @Builder
-    public Menu(Long shopId, Long menuCategoryId, String name, String introduction, int price, boolean isSelling) {
+    public MenuEntity(Long shopId, Long menuCategoryId, String name, String introduction, int price, boolean isSelling) {
         this.shopId = shopId;
         this.menuCategoryId = menuCategoryId;
         this.name = name;

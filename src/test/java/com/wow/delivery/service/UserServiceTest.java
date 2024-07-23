@@ -3,7 +3,7 @@ package com.wow.delivery.service;
 import com.wow.delivery.dto.common.PasswordEncodingDTO;
 import com.wow.delivery.dto.user.UserSigninDTO;
 import com.wow.delivery.dto.user.UserSignupDTO;
-import com.wow.delivery.entity.User;
+import com.wow.delivery.entity.UserEntity;
 import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.InvalidParameterException;
 import com.wow.delivery.repository.UserRepository;
@@ -127,14 +127,14 @@ public class UserServiceTest {
             PasswordEncodingDTO passwordEncoder =
                 PasswordEncoder.encodePassword(signupDTO.getPassword());
 
-            User user = User.builder()
+            UserEntity userEntity = UserEntity.builder()
                 .email(signupDTO.getEmail())
                 .password(passwordEncoder.getEncodePassword())
                 .salt(passwordEncoder.getSalt())
                 .phoneNumber(signupDTO.getPhoneNumber())
                 .build();
 
-            user.setId(1L);
+            userEntity.setId(1L);
 
             UserSigninDTO signinDTO = UserSigninDTO.builder()
                 .email("test@gmail.com")
@@ -144,7 +144,7 @@ public class UserServiceTest {
             HttpSession session = mock(HttpSession.class);
 
             given(userRepository.findUserByEmail(signinDTO.getEmail()))
-                .willReturn(Optional.of(user));
+                .willReturn(Optional.of(userEntity));
 
             // when
             userService.signin(signinDTO, session);
@@ -189,7 +189,7 @@ public class UserServiceTest {
             PasswordEncodingDTO passwordEncoder =
                 PasswordEncoder.encodePassword(password);
 
-            User user = User.builder()
+            UserEntity userEntity = UserEntity.builder()
                 .email("seyun@gmail.com")
                 .password(passwordEncoder.getEncodePassword())
                 .salt(passwordEncoder.getSalt())
@@ -199,7 +199,7 @@ public class UserServiceTest {
             HttpSession session = mock(HttpSession.class);
 
             given(userRepository.findUserByEmail(faliSigninDTO.getEmail()))
-                .willReturn(Optional.of(user));
+                .willReturn(Optional.of(userEntity));
 
             // when & then
             assertThatThrownBy(() -> userService.signin(faliSigninDTO, session))
@@ -216,7 +216,7 @@ public class UserServiceTest {
             PasswordEncodingDTO passwordEncoder =
                 PasswordEncoder.encodePassword(password);
 
-            User user = User.builder()
+            UserEntity userEntity = UserEntity.builder()
                 .email("seyun@gmail.com")
                 .password(passwordEncoder.getEncodePassword())
                 .salt(passwordEncoder.getSalt())
@@ -225,7 +225,7 @@ public class UserServiceTest {
 
             String uuid = UUID.randomUUID().toString();
             HttpSession session = spy(HttpSession.class);
-            session.setAttribute(uuid, user);
+            session.setAttribute(uuid, userEntity);
 
             // when
             userService.logout(session);

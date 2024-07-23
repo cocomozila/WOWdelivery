@@ -3,8 +3,8 @@ package com.wow.delivery.service;
 import com.wow.delivery.dto.menu.category.MenuCategoryCreateDTO;
 import com.wow.delivery.dto.menu.category.MenuCategoryOrderUpdateDTO;
 import com.wow.delivery.dto.menu.category.MenuCategoryResponse;
-import com.wow.delivery.entity.menu.MenuCategory;
-import com.wow.delivery.entity.shop.Shop;
+import com.wow.delivery.entity.menu.MenuCategoryEntity;
+import com.wow.delivery.entity.shop.ShopEntity;
 import com.wow.delivery.repository.MenuCategoryRepository;
 import com.wow.delivery.repository.ShopRepository;
 import org.assertj.core.api.Assertions;
@@ -48,27 +48,27 @@ class MenuCategoryServiceTest {
         @DisplayName("성공")
         void success() {
             // given
-            Shop shop = Shop.builder()
+            ShopEntity shopEntity = ShopEntity.builder()
                 .build();
-            shop.setId(1L);
+            shopEntity.setId(1L);
 
             MenuCategoryCreateDTO createDTO = MenuCategoryCreateDTO.builder()
                 .shopId(1L)
                 .name("치킨")
                 .build();
 
-            MenuCategory menuCategory = MenuCategory.builder()
+            MenuCategoryEntity menuCategoryEntity = MenuCategoryEntity.builder()
                 .shopId(1L)
                 .name("치킨")
                 .build();
 
-            menuCategory.setId(1L);
-            menuCategory.createCategoryOrder();
+            menuCategoryEntity.setId(1L);
+            menuCategoryEntity.createCategoryOrder();
 
             given(shopService.findByShopIdOrThrow(1L))
-                .willReturn(shop);
+                .willReturn(shopEntity);
             given(menuCategoryRepository.save(any()))
-                .willReturn(menuCategory);
+                .willReturn(menuCategoryEntity);
 
             // when
             menuCategoryService.createMenuCategory(createDTO);
@@ -88,26 +88,26 @@ class MenuCategoryServiceTest {
         @DisplayName("성공")
         void success() {
             // given
-            Shop shop = Shop.builder()
+            ShopEntity shopEntity = ShopEntity.builder()
                 .build();
-            shop.setId(1L);
+            shopEntity.setId(1L);
 
-            MenuCategory menuCategory1 = MenuCategory.builder()
+            MenuCategoryEntity menuCategoryEntity1 = MenuCategoryEntity.builder()
                 .shopId(1L)
                 .name("치킨")
                 .build();
-            menuCategory1.setId(1L);
+            menuCategoryEntity1.setId(1L);
 
-            MenuCategory menuCategory2 = MenuCategory.builder()
+            MenuCategoryEntity menuCategoryEntity2 = MenuCategoryEntity.builder()
                 .shopId(1L)
                 .name("치킨")
                 .build();
-            menuCategory2.setId(2L);
+            menuCategoryEntity2.setId(2L);
 
             given(shopService.findByShopIdOrThrow(1L))
-                .willReturn(shop);
+                .willReturn(shopEntity);
             given(menuCategoryRepository.findAllByShopId(1L))
-                .willReturn(Optional.of(List.of(menuCategory1, menuCategory2)));
+                .willReturn(Optional.of(List.of(menuCategoryEntity1, menuCategoryEntity2)));
 
             // when
             List<MenuCategoryResponse> menuCategories = menuCategoryService.getMenuCategory(1L);
@@ -125,30 +125,30 @@ class MenuCategoryServiceTest {
         @DisplayName("순서 변경 성공")
         void successReorder() {
             // given
-            Shop shop = Shop.builder()
+            ShopEntity shopEntity = ShopEntity.builder()
                 .build();
-            shop.setId(1L);
+            shopEntity.setId(1L);
 
-            MenuCategory menuCategory1 = MenuCategory.builder()
+            MenuCategoryEntity menuCategoryEntity1 = MenuCategoryEntity.builder()
                 .shopId(1L)
                 .name("치킨")
                 .build();
-            menuCategory1.setId(1L);
-            menuCategory1.createCategoryOrder();
+            menuCategoryEntity1.setId(1L);
+            menuCategoryEntity1.createCategoryOrder();
 
-            MenuCategory menuCategory2 = MenuCategory.builder()
+            MenuCategoryEntity menuCategoryEntity2 = MenuCategoryEntity.builder()
                 .shopId(1L)
                 .name("치킨")
                 .build();
-            menuCategory2.setId(2L);
-            menuCategory2.createCategoryOrder();
+            menuCategoryEntity2.setId(2L);
+            menuCategoryEntity2.createCategoryOrder();
 
-            MenuCategory menuCategory3 = MenuCategory.builder()
+            MenuCategoryEntity menuCategoryEntity3 = MenuCategoryEntity.builder()
                 .shopId(1L)
                 .name("치킨")
                 .build();
-            menuCategory3.setId(3L);
-            menuCategory3.createCategoryOrder();
+            menuCategoryEntity3.setId(3L);
+            menuCategoryEntity3.createCategoryOrder();
 
             List<Long> beforeIds = List.of(1L, 2L, 3L);
             List<Long> afterIds = List.of(2L, 3L, 1L);
@@ -159,7 +159,7 @@ class MenuCategoryServiceTest {
                 .afterIds(afterIds)
                 .build();
 
-            List<MenuCategory> menuCategories = List.of(menuCategory3, menuCategory2, menuCategory1);
+            List<MenuCategoryEntity> menuCategories = List.of(menuCategoryEntity3, menuCategoryEntity2, menuCategoryEntity1);
 
             given(menuCategoryRepository.findByIdIn(beforeIds))
                 .willReturn(menuCategories);
@@ -168,9 +168,9 @@ class MenuCategoryServiceTest {
             menuCategoryService.reorderMenuCategories(updateDTO);
 
             // then
-            Assertions.assertThat(menuCategory1.getMenuCategoryOrder()).isEqualTo(3);
-            Assertions.assertThat(menuCategory2.getMenuCategoryOrder()).isEqualTo(1);
-            Assertions.assertThat(menuCategory3.getMenuCategoryOrder()).isEqualTo(2);
+            Assertions.assertThat(menuCategoryEntity1.getMenuCategoryOrder()).isEqualTo(3);
+            Assertions.assertThat(menuCategoryEntity2.getMenuCategoryOrder()).isEqualTo(1);
+            Assertions.assertThat(menuCategoryEntity3.getMenuCategoryOrder()).isEqualTo(2);
         }
     }
 }
