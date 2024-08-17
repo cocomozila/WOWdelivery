@@ -13,10 +13,12 @@ import com.wow.delivery.entity.shop.ShopEntity;
 import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.OrderException;
 import com.wow.delivery.error.exception.PaymentException;
+import com.wow.delivery.kafka.producer.OrderProducer;
 import com.wow.delivery.repository.OrderDetailsRepository;
 import com.wow.delivery.repository.OrderRepository;
 import com.wow.delivery.repository.PaymentRepository;
 import com.wow.delivery.repository.UserRepository;
+import com.wow.delivery.service.order.OrderService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -57,6 +59,9 @@ class OrderServiceTest {
 
     @Spy
     private OrderDetailsRepository orderDetailsRepository;
+
+    @Mock
+    private OrderProducer orderProducer;
 
     @Nested
     @DisplayName("생성")

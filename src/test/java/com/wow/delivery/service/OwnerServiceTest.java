@@ -7,6 +7,7 @@ import com.wow.delivery.entity.OwnerEntity;
 import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.InvalidParameterException;
 import com.wow.delivery.repository.OwnerRepository;
+import com.wow.delivery.service.owner.OwnerService;
 import com.wow.delivery.util.PasswordEncoder;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.AfterEach;
