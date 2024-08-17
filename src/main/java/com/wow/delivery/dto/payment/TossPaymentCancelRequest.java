@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TossPaymentCancelRequest {
 
-    private String cancelReason;
+    private String cancelReason; // 취소 사유
 
     @Builder
     public TossPaymentCancelRequest(String cancelReason) {

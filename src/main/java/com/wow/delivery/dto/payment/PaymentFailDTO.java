@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PaymentFailDTO {
 
-    private String errorCode;
-    private String errorMessage;
+    private String errorCode; // 에러코드
+    private String errorMessage; // 에러메세지
 
     @Builder
     public PaymentFailDTO(String errorCode, String errorMessage) {

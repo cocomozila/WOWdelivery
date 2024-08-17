@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "payment")
+@Table(name = "payments")
 public class PaymentEntity extends BaseEntity {
 
     @Comment(value = "유저 ID")

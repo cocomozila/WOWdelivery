@@ -3,29 +3,22 @@ package com.wow.delivery.dto.payment;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @NoArgsConstructor
 public class PaymentResponse {
 
-    @Comment(value = "유저 ID")
-    private Long userId;
+    private Long userId; // 유저 ID
 
-    @Comment(value = "지불 방법")
-    private String payType;
+    private String payType; // 지불 방법
 
-    @Comment(value = "주문 고유 ID")
-    private String transactionId;
+    private String transactionId; // 주문 고유 UUID
 
-    @Comment(value = "지불 금액")
-    private Long amount;
+    private Long amount; // 지불 금액
 
-    @Comment(value = "결제 성공 시 콜백 주소")
-    private String successUrl;
+    private String successUrl; // 결제 성공 시 콜백 주소
 
-    @Comment(value = "결제 실패 시 콜백 주소")
-    private String failUrl;
+    private String failUrl; // 결제 실패 시 콜백 주소
 
     @Builder
     public PaymentResponse(Long userId, String payType, Long amount, String transactionId, String successUrl, String failUrl) {

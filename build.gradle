@@ -42,6 +42,10 @@ dependencies {
 	implementation 'org.springframework.session:spring-session-data-redis'
 	// s2-geometry-library-java
 	implementation group: 'io.sgr', name: 's2-geometry-library-java', version: '1.0.1'
+	// kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+	// jackson-datatype-jsr310
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {

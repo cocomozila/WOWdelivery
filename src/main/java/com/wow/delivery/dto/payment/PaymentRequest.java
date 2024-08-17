@@ -5,23 +5,19 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @NoArgsConstructor
 public class PaymentRequest {
 
     @NotNull
-    @Comment(value = "유저 ID")
-    private Long userId;
+    private Long userId; // 유저 ID
 
     @NotNull
-    @Comment(value = "지불 방법")
-    private String payType;
+    private String payType; // 지불 방법
 
     @Min(0)
-    @Comment(value = "지불 금액")
-    private Long amount;
+    private Long amount; // 지불 금액
 
     @Builder
     public PaymentRequest(Long userId, String payType, Long amount) {
