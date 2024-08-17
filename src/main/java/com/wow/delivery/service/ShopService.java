@@ -145,6 +145,7 @@ public class ShopService {
             .toList();
     }
 
+    @Transactional(readOnly = true)
     public ShopEntity findByShopIdOrThrow(Long shopId) {
         return shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
     }

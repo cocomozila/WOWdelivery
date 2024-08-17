@@ -1,9 +1,10 @@
 package com.wow.delivery.controller;
 
+import com.wow.delivery.dto.order.OrderAcceptDTO;
 import com.wow.delivery.dto.order.OrderCancelDTO;
 import com.wow.delivery.dto.order.OrderCreateDTO;
 import com.wow.delivery.dto.order.OrderResponse;
-import com.wow.delivery.service.OrderService;
+import com.wow.delivery.service.order.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,5 +33,15 @@ public class OrderController {
     public ResponseEntity<HttpStatus> cancelOrder(@RequestBody OrderCancelDTO cancelDTO) {
         orderService.cancelOrder(cancelDTO);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/accecpt")
+    public void acceptOrder(@RequestBody @Valid OrderAcceptDTO orderAcceptDTO) {
+        orderService.acceptOrder(orderAcceptDTO);
+    }
+
+    @PostMapping("/reject")
+    public void rejectOrder(@RequestBody @Valid OrderAcceptDTO orderAcceptDTO) {
+        orderService.rejectOrder(orderAcceptDTO);
     }
 }
