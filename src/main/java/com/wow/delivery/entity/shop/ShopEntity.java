@@ -2,11 +2,8 @@ package com.wow.delivery.entity.shop;
 
 import com.wow.delivery.entity.BaseEntity;
 import com.wow.delivery.entity.common.Address;
-import com.wow.delivery.util.SnowFlakeGenerator;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
+import com.wow.delivery.util.Base36UUIDGenerator;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "shops")
 public class ShopEntity extends BaseEntity {
 
     @Column(name = "public_id") // 가게 고유 번호 uuid w-12sf113
@@ -58,7 +56,7 @@ public class ShopEntity extends BaseEntity {
 
     @Builder
     public ShopEntity(Long ownerId, String shopName, String introduction, BusinessHours businessHours, Address address, List<DayOfWeek> openDays, int minOrderPrice, int deliveryFee, S2LevelToken s2LevelToken) {
-        this.publicId = SnowFlakeGenerator.generateBase36String();
+        this.publicId = Base36UUIDGenerator.generate(7);
         this.ownerId = ownerId;
         this.shopName = shopName;
         this.introduction = introduction;
