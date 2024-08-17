@@ -19,6 +19,7 @@ public enum ErrorCode {
     PAYMENT_DATA_NOT_FOUND("결제 데이터를 찾을 수 없습니다."),
     ORDER_DATA_NOT_FOUND("주문 데이터를 찾을 수 없습니다."),
     ORDER_DETAILS_NOT_FOUND("상세 주문 데이터를 찾을 수 없습니다."),
+    COUPON_DATA_NOT_FOUND("쿠폰 데이터를 찾을 수 없습니다."),
 
     // Parameter
     INVALID_PARAMETER("유효하지 않은 입력 값입니다."),
@@ -30,7 +31,10 @@ public enum ErrorCode {
     FILE_ERROR("파일 오류입니다."),
 
     // STATUS
-    STATUS_CHANGE_NOT_ALLOWED("상태 변경이 불가능합니다.");
+    STATUS_CHANGE_NOT_ALLOWED("상태 변경이 불가능합니다."),
+
+    // EXPIRE
+    EXPIRE_DATA("만료된 데이터 입니다.");
 
     private final String message;
 
