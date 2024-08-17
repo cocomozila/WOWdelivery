@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PaymentCancelRequest {
 
-    private String paymentKey;
-    private String cancelReason;
+    private String paymentKey; // 거래 Key
+    private String cancelReason; // 취소 사유
 
     @JsonProperty("orderId")
-    private String transactionId;
+    private String transactionId; // 주문 고유 UUID
 
     @Builder
     public PaymentCancelRequest(String paymentKey, String cancelReason, String transactionId) {
