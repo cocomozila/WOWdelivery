@@ -2,19 +2,15 @@ package com.wow.delivery.dto.menu.category;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.Comment;
 
 @Getter
 public class MenuCategoryResponse {
 
-    @Comment("메뉴 카테고리 ID")
-    private Long menuCategoryId;
+    private Long menuCategoryId; // 메뉴 카테고리 ID
 
-    @Comment(value = "메뉴 카테고리 이름")
-    private String name;
+    private String name; // 메뉴 카테고리 이름
 
-    @Comment(value = "순서")
-    private int menuCategoryOrder;
+    private int menuCategoryOrder; // 순서
 
     @Builder
     public MenuCategoryResponse(Long MenuCategoryId, String name, int menuCategoryOrder) {

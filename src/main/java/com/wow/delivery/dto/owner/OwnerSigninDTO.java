@@ -12,11 +12,11 @@ public class OwnerSigninDTO {
 
     @NotNull
     @Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$")
-    private String email;
+    private String email; // 이메일
 
     @NotBlank
     @Size(min = 8, max = 16)
-    private String password;
+    private String password; // 패스워드
 
     public OwnerSigninDTO() {}
 

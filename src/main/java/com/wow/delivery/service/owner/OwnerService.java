@@ -1,4 +1,4 @@
-package com.wow.delivery.service;
+package com.wow.delivery.service.owner;
 
 import com.wow.delivery.dto.common.PasswordEncodingDTO;
 import com.wow.delivery.dto.owner.OwnerSigninDTO;

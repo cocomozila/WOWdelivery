@@ -5,19 +5,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @NoArgsConstructor
 public class MenuCategoryCreateDTO {
 
     @NotNull
-    @Comment("가게 ID")
-    private Long shopId;
+    private Long shopId; // 가게 ID
 
     @NotBlank
-    @Comment(value = "메뉴 카테고리 이름")
-    private String name;
+    private String name; // 메뉴 카테고리 이름
 
     @Builder
     public MenuCategoryCreateDTO(Long shopId, String name) {

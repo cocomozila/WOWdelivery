@@ -1,4 +1,4 @@
-package com.wow.delivery.service;
+package com.wow.delivery.service.user;
 
 import com.wow.delivery.dto.common.PasswordEncodingDTO;
 import com.wow.delivery.dto.user.UserSigninDTO;

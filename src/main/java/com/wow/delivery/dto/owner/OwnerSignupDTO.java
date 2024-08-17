@@ -12,15 +12,15 @@ public class OwnerSignupDTO {
 
     @NotNull
     @Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$")
-    private String email;
+    private String email; // 이메일
 
     @NotBlank
     @Size(min = 8, max = 16)
-    private String password;
+    private String password; // 패스워드
 
     @NotNull
     @Pattern(regexp = "^01(?:0|1|[6-9])(\\d{3}|\\d{4})(\\d{4})$")
-    private String phoneNumber;
+    private String phoneNumber; // 휴대폰 번호
 
     public OwnerSignupDTO() {
     }

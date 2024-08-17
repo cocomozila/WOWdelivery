@@ -3,32 +3,24 @@ package com.wow.delivery.dto.menu;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @NoArgsConstructor
 public class MenuResponse {
 
-    @Comment(value = "메뉴 ID")
-    private Long menuId;
+    private Long menuId; // 메뉴 ID
 
-    @Comment(value = "메뉴 카테고리 ID")
-    private Long menuCategoryId;
+    private Long menuCategoryId; // 메뉴 카테고리 ID
 
-    @Comment(value = "메뉴 이름")
-    private String name;
+    private String name; // 메뉴 이름
 
-    @Comment(value = "메뉴 설명")
-    private String introduction;
+    private String introduction; // 메뉴 설명
 
-    @Comment(value = "메뉴 가격")
-    private int price;
+    private int price; // 메뉴 가격
 
-    @Comment(value = "메뉴 이미지 경로")
-    private String imagePath;
+    private String imagePath; // 메뉴 이미지 경로
 
-    @Comment(value = "메뉴 순서")
-    private int menuOrder;
+    private int menuOrder; // 메뉴 순서
 
     @Builder
     public MenuResponse(Long menuId, Long menuCategoryId, String name, String introduction, int price, String imagePath, int menuOrder) {

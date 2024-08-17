@@ -4,24 +4,19 @@ import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.InvalidParameterException;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.Comment;
 
 import java.util.List;
 
 @Getter
 public class MenuCategoryOrderUpdateDTO {
 
-    @Comment(value = "수정하는 메뉴 카테고리의 가게 ID")
-    private Long shopId;
+    private Long shopId; // 수정하는 메뉴 카테고리의 가게 ID
 
-    @Comment(value = "기존의 메뉴 카테고리 순서")
-    private List<Long> beforeIds;
+    private List<Long> beforeIds; // 기존의 메뉴 카테고리 순서
 
-    @Comment(value = "수정된 메뉴 카테고리 순서")
-    private List<Long> afterIds;
+    private List<Long> afterIds; // 수정된 메뉴 카테고리 순서
 
-    @Comment(value = "메뉴 카테고리 리스트의 사이즈")
-    private int size;
+    private int size; // 메뉴 카테고리 리스트의 사이즈
 
     @Builder
     public MenuCategoryOrderUpdateDTO(Long shopId, List<Long> beforeIds, List<Long> afterIds) {

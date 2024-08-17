@@ -1,11 +1,11 @@
 package com.wow.delivery.dto.order;
 
 import com.wow.delivery.dto.order.details.OrderDetailsResponse;
+import com.wow.delivery.entity.common.Address;
 import com.wow.delivery.entity.order.OrderStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 import java.util.List;
 
@@ -13,35 +13,37 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderResponse {
 
-    @Comment(value = "주문 번호")
-    private String orderNumber;
+    private Long shopId; // 가게 ID
 
-    @Comment(value = "주문 상태")
-    private OrderStatus orderStatus;
+    private String orderNumber; // 주문 번호
 
-    @Comment(value = "주문 요청사항")
-    private String orderRequest;
+    private OrderStatus orderStatus; // 주문 상태
 
-    @Comment(value = "주문 금액")
-    private Long orderPrice;
+    private String orderRequest; // 주문 요청사항
 
-    @Comment(value = "배달비")
-    private Long deliveryFee;
+    private Long orderPrice; // 주문 금액
 
-    @Comment(value = "총 결제금액")
-    private Long totalPaymentAmount;
+    private Long deliveryFee; // 배달비
 
-    @Comment(value = "메뉴들")
-    private List<OrderDetailsResponse> orderDetailsResponses;
+    private Long totalPaymentAmount; // 총 결제금액
+
+    private Address address; // 배달 받을 주소
+
+    private List<OrderDetailsResponse> orderDetailsResponses; // 메뉴들
+
+    private Long couponId; // 쿠폰 ID
 
     @Builder
-    public OrderResponse(String orderNumber, OrderStatus orderStatus, String orderRequest, Long orderPrice, Long deliveryFee, Long totalPaymentAmount, List<OrderDetailsResponse> orderDetailsResponses) {
+    public OrderResponse(Long shopId, String orderNumber, OrderStatus orderStatus, String orderRequest, Long orderPrice, Long deliveryFee, Long totalPaymentAmount, Address address, List<OrderDetailsResponse> orderDetailsResponses, Long couponId) {
+        this.shopId = shopId;
         this.orderNumber = orderNumber;
         this.orderStatus = orderStatus;
         this.orderRequest = orderRequest;
         this.orderPrice = orderPrice;
         this.deliveryFee = deliveryFee;
         this.totalPaymentAmount = totalPaymentAmount;
+        this.address = address;
         this.orderDetailsResponses = orderDetailsResponses;
+        this.couponId = couponId;
     }
 }

@@ -1,12 +1,12 @@
 package com.wow.delivery.dto.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wow.delivery.entity.common.Address;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 import java.util.List;
 
@@ -15,35 +15,32 @@ import java.util.List;
 public class OrderCreateDTO {
 
     @NotNull
-    @Comment(value = "유저 ID")
-    private Long userId;
+    private Long userId; // 유저 ID
 
     @NotNull
-    @Comment(value = "가게 ID")
-    private Long shopId;
+    private Long shopId; // 가게 ID
 
     @NotBlank
-    @Comment(value = "거래 UUID")
     @JsonProperty("orderId")
-    private String transactionId;
+    private String transactionId; // 거래 UUID
 
     @NotNull
     private List<OrderCart> orderCart;
 
-    @Comment(value = "주문 요청 사항")
-    private String orderRequest;
+    private String orderRequest; // 주문 요청 사항
 
-    @Comment(value = "주문 금액")
-    private Long orderPrice;
+    private Long orderPrice; // 주문 금액
 
-    @Comment(value = "배달비")
-    private Long deliveryFee;
+    private Long deliveryFee; // 배달비
 
-    @Comment(value = "총 결제 금액")
-    private Long totalPaymentAmount;
+    private Long totalPaymentAmount; // 총 결제 금액
+
+    private Address address; // 배달 받을 주소
+
+    private Long couponId; // 쿠폰 ID
 
     @Builder
-    public OrderCreateDTO(Long userId, Long shopId, String transactionId, List<OrderCart> orderCart, String orderRequest, Long orderPrice, Long deliveryFee, Long totalPaymentAmount) {
+    public OrderCreateDTO(Long userId, Long shopId, String transactionId, List<OrderCart> orderCart, String orderRequest, Long orderPrice, Long deliveryFee, Long totalPaymentAmount, Address address, Long couponId) {
         this.userId = userId;
         this.shopId = shopId;
         this.transactionId = transactionId;
@@ -52,5 +49,7 @@ public class OrderCreateDTO {
         this.orderPrice = orderPrice;
         this.deliveryFee = deliveryFee;
         this.totalPaymentAmount = totalPaymentAmount;
+        this.address = address;
+        this.couponId = couponId;
     }
 }

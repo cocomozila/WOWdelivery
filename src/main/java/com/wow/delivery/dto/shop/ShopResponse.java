@@ -2,12 +2,8 @@ package com.wow.delivery.dto.shop;
 
 import com.wow.delivery.entity.common.Address;
 import com.wow.delivery.entity.shop.BusinessHours;
-import com.wow.delivery.entity.shop.DayOfWeekListConverter;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.Comment;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -28,9 +24,7 @@ public class ShopResponse {
     @Comment(value = "주소")
     private Address address;
 
-    @Column(name = "open_days")
-    @Convert(converter = DayOfWeekListConverter.class)
-    private List<DayOfWeek> openDays = new ArrayList<>();
+    private List<DayOfWeek> openDays = new ArrayList<>(); // 영업하는 요일
 
     @Comment(value = "최소 주문 금액")
     private int minOrderPrice;

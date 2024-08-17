@@ -5,7 +5,6 @@ import com.wow.delivery.error.exception.InvalidParameterException;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.Comment;
 
 import java.util.List;
 
@@ -13,19 +12,15 @@ import java.util.List;
 public class MenuOrderUpdateDTO {
 
     @NotNull
-    @Comment(value = "수정하는 메뉴 카테고리 ID")
-    private Long menuCategoryId;
+    private Long menuCategoryId; // 수정하는 메뉴 카테고리 ID
 
     @NotNull
-    @Comment(value = "기존의 메뉴 순서")
-    private List<Long> beforeMenuIds;
+    private List<Long> beforeMenuIds; // 기존의 메뉴 순서
 
     @NotNull
-    @Comment(value = "수정된 메뉴 순서")
-    private List<Long> afterMenuIds;
+    private List<Long> afterMenuIds; // 수정된 메뉴 순서
 
-    @Comment(value = "메뉴 리스트의 사이즈")
-    private int size;
+    private int size; // 메뉴 리스트의 사이즈
 
     @Builder
     public MenuOrderUpdateDTO(Long menuCategoryId, List<Long> beforeMenuIds, List<Long> afterMenuIds) {
