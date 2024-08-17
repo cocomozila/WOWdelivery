@@ -17,28 +17,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
-    private final TossPaymentApiSender tossPaymentApiSender;
-
-    @Value("${test.toss.secret.api.key}")
-    private static String TEST_TOSS_SECRET_API_KEY;
+    private final TossPaymentClient tossPaymentClient;
 
     @Value("${test.toss.success.callback.url}")
-    private static String TEST_TOSS_SUCCESS_CALLBACK_URL;
+    private String TEST_TOSS_SUCCESS_CALLBACK_URL;
 
-    @Value("${test.toss.fali.callback.url}")
-    private static String TEST_TOSS_FAIL_CALLBACK_URL;
+    @Value("${test.toss.fail.callback.url}")
+    private String TEST_TOSS_FAIL_CALLBACK_URL;
 
     @Value("${test.toss.origin.url}")
-    private static String TOSS_ORIGIN_URL;
+    private String TOSS_ORIGIN_URL;
 
     @Transactional
     public PaymentResponse requestPayment(PaymentRequest request) {
@@ -79,11 +73,8 @@ public class PaymentService {
     }
 
     public String requestFinalPayment(String paymentKey, String transactionId, Long amount) {
-        String encodedAuth = Base64.getEncoder()
-            .encodeToString(TEST_TOSS_SECRET_API_KEY.getBytes(StandardCharsets.UTF_8));
-
         String uri = TOSS_ORIGIN_URL + paymentKey;
-        return tossPaymentApiSender.requestTossFinalPayment(uri, encodedAuth, transactionId, amount);
+        return tossPaymentClient.requestTossFinalPayment(uri, transactionId, amount);
     }
 
     @Transactional
@@ -102,11 +93,8 @@ public class PaymentService {
     }
 
     public String cancelPayment(PaymentCancelRequest request) {
-        String encodedAuth = Base64.getEncoder()
-            .encodeToString(TEST_TOSS_SECRET_API_KEY.getBytes(StandardCharsets.UTF_8));
-
         String uri = TOSS_ORIGIN_URL + request.getPaymentKey() + "/cancel";
-        String cancelResponse = tossPaymentApiSender.requestTossCancelPayment(uri, encodedAuth, request.getCancelReason());
+        String cancelResponse = tossPaymentClient.requestTossCancelPayment(uri, request.getCancelReason());
 
         if (cancelResponse == null) {
             throw new PaymentException(ErrorCode.INVALID_PARAMETER, "잘못된 API 요청 입니다.");
