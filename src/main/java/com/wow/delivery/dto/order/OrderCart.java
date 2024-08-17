@@ -3,23 +3,18 @@ package com.wow.delivery.dto.order;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Comment;
 
 @Getter
 @NoArgsConstructor
 public class OrderCart {
 
-    @Comment(value = "메뉴 ID")
-    private Long menuId;
+    private Long menuId; // 메뉴 ID
 
-    @Comment(value = "메뉴 이름")
-    private String menuName; // 삭제
+    private String menuName; // 메뉴 이름
 
-    @Comment(value = "메뉴 가격")
-    private Long price; // 삭제
+    private Long price; // 메뉴 가격
 
-    @Comment(value = "메뉴 수량")
-    private int amount;
+    private int amount; // 메뉴 수량
 
     @Builder
     public OrderCart(Long menuId, String menuName, Long price, int amount) {

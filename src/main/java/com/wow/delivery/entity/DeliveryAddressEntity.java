@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "delivery_address")
+@Table(name = "delivery_addresses")
 public class DeliveryAddressEntity extends BaseEntity {
 
     @Column(name = "user_id")

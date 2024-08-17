@@ -13,7 +13,7 @@ import org.hibernate.annotations.Comment;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "menu_category")
+@Table(name = "menu_categories")
 public class MenuCategoryEntity extends BaseEntity {
 
     @Comment("가게 ID")

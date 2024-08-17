@@ -3,7 +3,7 @@ package com.wow.delivery.controller;
 import com.wow.delivery.dto.user.UserSigninDTO;
 import com.wow.delivery.dto.user.UserSigninResponse;
 import com.wow.delivery.dto.user.UserSignupDTO;
-import com.wow.delivery.service.UserService;
+import com.wow.delivery.service.user.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

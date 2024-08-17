@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class UserSigninResponse {
 
-    private Long id;
+    private Long id; // ID
 
     @Builder
     public UserSigninResponse(Long id) {
