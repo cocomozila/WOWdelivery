@@ -12,22 +12,17 @@ import java.util.List;
 @Getter
 public class ShopResponse {
 
-    @Comment(value = "가게 명")
-    private String shopName;
+    private final String shopName; // 가게명
 
-    @Comment(value = "가게 소개")
-    private String introduction;
+    private final String introduction; // 가게 소개
 
-    @Comment(value = "영업 시간")
-    private BusinessHours businessHours;
+    private final BusinessHours businessHours; // 영업 시간
 
-    @Comment(value = "주소")
-    private Address address;
+    private final Address address; // 주소
 
     private List<DayOfWeek> openDays = new ArrayList<>(); // 영업하는 요일
 
-    @Comment(value = "최소 주문 금액")
-    private int minOrderPrice;
+    private final int minOrderPrice; // 최소 주문 금액
 
     @Builder
     public ShopResponse(String shopName, String introduction, BusinessHours businessHours, Address address, List<DayOfWeek> openDays, int minOrderPrice) {
