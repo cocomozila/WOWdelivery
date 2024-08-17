@@ -11,7 +11,7 @@ import com.wow.delivery.error.exception.PaymentException;
 import com.wow.delivery.repository.PaymentRepository;
 import com.wow.delivery.repository.UserRepository;
 import com.wow.delivery.service.payment.PaymentService;
-import com.wow.delivery.service.payment.TossPaymentApiSender;
+import com.wow.delivery.service.payment.TossPaymentClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,11 +44,10 @@ class PaymentServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private TossPaymentApiSender tossPaymentApiSender;
+    private TossPaymentClient tossPaymentClient;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(paymentService, "TEST_TOSS_SECRET_API_KEY", "test_sk_jExPeJWYVQbKnokMJYaxr49R5gvN:");
         ReflectionTestUtils.setField(paymentService, "TEST_TOSS_SUCCESS_CALLBACK_URL", "http://localhost:8080/api/payments/success");
         ReflectionTestUtils.setField(paymentService, "TEST_TOSS_FAIL_CALLBACK_URL", "http://localhost:8080/api/payments/fail");
         ReflectionTestUtils.setField(paymentService, "TOSS_ORIGIN_URL", "https://api.tosspayments.com/v1/payments/");
@@ -210,7 +209,7 @@ class PaymentServiceTest {
 
             given(paymentRepository.findByTransactionId(any()))
                 .willReturn(Optional.of(payment));
-            given(tossPaymentApiSender.requestTossCancelPayment(any(), any(), any()))
+            given(tossPaymentClient.requestTossCancelPayment(any(), any()))
                 .willReturn("ok");
 
             // when
