@@ -1,5 +1,6 @@
-package com.wow.delivery.service;
+package com.wow.delivery.service.order;
 
+import com.wow.delivery.dto.order.OrderAcceptDTO;
 import com.wow.delivery.dto.order.OrderCancelDTO;
 import com.wow.delivery.dto.order.OrderCreateDTO;
 import com.wow.delivery.dto.order.OrderResponse;
@@ -7,20 +8,29 @@ import com.wow.delivery.dto.order.details.OrderDetailsResponse;
 import com.wow.delivery.entity.UserEntity;
 import com.wow.delivery.entity.order.OrderDetailsEntity;
 import com.wow.delivery.entity.order.OrderEntity;
+import com.wow.delivery.entity.order.OrderStatus;
 import com.wow.delivery.entity.payment.PaymentEntity;
 import com.wow.delivery.entity.shop.ShopEntity;
 import com.wow.delivery.error.ErrorCode;
+import com.wow.delivery.error.exception.DataNotFoundException;
+import com.wow.delivery.error.exception.InvalidParameterException;
 import com.wow.delivery.error.exception.OrderException;
 import com.wow.delivery.error.exception.PaymentException;
+import com.wow.delivery.kafka.KafkaTopics;
+import com.wow.delivery.kafka.producer.OrderProducer;
 import com.wow.delivery.repository.OrderDetailsRepository;
 import com.wow.delivery.repository.OrderRepository;
 import com.wow.delivery.repository.PaymentRepository;
 import com.wow.delivery.repository.UserRepository;
+import com.wow.delivery.service.ShopService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +41,10 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ShopService shopService;
     private final OrderDetailsRepository orderDetailsRepository;
+    private final OrderProducer orderProducer;
 
     @Transactional
+    @Retryable(retryFor = InvalidParameterException.class, backoff = @Backoff(delay = 300))
     public void createOrder(OrderCreateDTO createDTO) {
         UserEntity userEntity = userRepository.findByIdOrThrow(createDTO.getUserId(), ErrorCode.USER_DATA_NOT_FOUND, null);
         ShopEntity shopEntity = shopService.findByShopIdOrThrow(createDTO.getShopId());
@@ -43,11 +55,15 @@ public class OrderService {
             .userId(userEntity.getIdOrThrow())
             .shopId(shopEntity.getIdOrThrow())
             .paymentId(paymentEntity.getIdOrThrow())
+            .address(createDTO.getAddress())
             .orderRequest(createDTO.getOrderRequest())
             .orderPrice(createDTO.getOrderPrice())
             .deliveryFee(createDTO.getDeliveryFee())
             .totalPaymentAmount(createDTO.getTotalPaymentAmount())
+            .couponId(createDTO.getCouponId())
             .build();
+
+        validOrderNumber(orderEntity.getOrderNumber());
 
         OrderEntity saveOrderEntity = orderRepository.save(orderEntity);
 
@@ -61,11 +77,41 @@ public class OrderService {
             .toList();
 
         orderDetailsRepository.saveAll(orderDetailEntities);
+
+        List<OrderDetailsResponse> orderDetailsResponses = createDTO.getOrderCart()
+            .stream()
+            .map(o -> OrderDetailsResponse.builder()
+                .menuId(o.getMenuId())
+                .amount(o.getAmount())
+                .build())
+            .toList();
+
+        OrderResponse orderResponse = OrderResponse.builder()
+            .shopId(saveOrderEntity.getShopId())
+            .orderNumber(saveOrderEntity.getOrderNumber())
+            .orderStatus(saveOrderEntity.getOrderStatus())
+            .orderRequest(saveOrderEntity.getOrderRequest())
+            .orderPrice(saveOrderEntity.getOrderPrice())
+            .address(saveOrderEntity.getAddress())
+            .deliveryFee(saveOrderEntity.getDeliveryFee())
+            .totalPaymentAmount(saveOrderEntity.getTotalPaymentAmount())
+            .orderDetailsResponses(orderDetailsResponses)
+            .couponId(saveOrderEntity.getCouponId())
+            .build();
+
+        orderProducer.sendEvent(KafkaTopics.CREATE_ORDER, orderResponse);
     }
 
     private void validPayment(PaymentEntity paymentEntity, OrderCreateDTO createDTO) {
         if (!paymentEntity.getAmount().equals(createDTO.getTotalPaymentAmount())) {
             throw new PaymentException(ErrorCode.INVALID_PARAMETER, "주문 총 금액이 결제 금액과 일치하지 않습니다.");
+        }
+    }
+
+    private void validOrderNumber(String orderNumber) {
+        Optional<OrderEntity> order = orderRepository.findByOrderNumber(orderNumber);
+        if (order.isPresent()) {
+            throw new InvalidParameterException(ErrorCode.INVALID_PARAMETER, "중복된 주문번호 입니다.");
         }
     }
 
@@ -81,6 +127,7 @@ public class OrderService {
             .toList();
 
         return OrderResponse.builder()
+            .shopId(orderEntity.getShopId())
             .orderNumber(orderEntity.getOrderNumber())
             .orderStatus(orderEntity.getOrderStatus())
             .orderRequest(orderEntity.getOrderRequest())
@@ -100,9 +147,30 @@ public class OrderService {
         orderEntity.orderCancel();
     }
 
+    @Transactional
+    public void cancelOrder(OrderResponse orderResponse) {
+        OrderEntity order = orderRepository.findByOrderNumber(orderResponse.getOrderNumber())
+            .orElseThrow(() -> new DataNotFoundException(ErrorCode.ORDER_DATA_NOT_FOUND, "주문 데이터를 찾을 수 없습니다."));
+        order.orderCancel();
+    }
+
+    @Transactional
+    public void acceptOrder(OrderAcceptDTO orderAcceptDTO) {
+        OrderEntity order = orderRepository.findByIdOrThrow(orderAcceptDTO.getOrderId(), ErrorCode.ORDER_DATA_NOT_FOUND, null);
+        order.updateOrderStatus(OrderStatus.PREPARING);
+        orderProducer.sendEvent(KafkaTopics.ACCEPT_ORDER, orderAcceptDTO);
+    }
+
+    @Transactional
+    public void rejectOrder(OrderAcceptDTO orderAcceptDTO) {
+        OrderEntity order = orderRepository.findByIdOrThrow(orderAcceptDTO.getOrderId(), ErrorCode.ORDER_DATA_NOT_FOUND, null);
+        order.updateOrderStatus(OrderStatus.CANCELED_OWNER);
+        orderProducer.sendEvent(KafkaTopics.REJECT_ORDER, orderAcceptDTO);
+    }
+
     // todo
     // 1. 결제 프로세스를 마친 유저가 주문을 생성
-    // 2. 메세지 큐에 주문 정보를 넣는다.
+    // 2. 메세지 큐(카프카)에 주문 정보를 넣는다.
     // 3. 메시지 큐에 담긴 주문 정보를 받아서 처리하는 것은 가게에 주문이 들어온 것을 알리는 "주문 알림 서비스"에서 처리한다.
     // 4. 주문 알림 서비스를 통해 가게 사장에게 주문 알림이 도착한다.
     // 5. 가게 사장은 주문을 승낙할지 거부할지 선택한다.
