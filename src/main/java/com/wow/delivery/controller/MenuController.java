@@ -2,6 +2,7 @@ package com.wow.delivery.controller;
 
 import com.wow.delivery.dto.menu.MenuCreateForm;
 import com.wow.delivery.dto.menu.MenuOrderUpdateDTO;
+import com.wow.delivery.dto.menu.MenuResponse;
 import com.wow.delivery.dto.menu.MenuUpdateForm;
 import com.wow.delivery.service.MenuService;
 import jakarta.validation.Valid;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/menus")
@@ -33,5 +36,10 @@ public class MenuController {
     public ResponseEntity<HttpStatus> reorderMenus(@RequestBody MenuOrderUpdateDTO updateDTO) {
         menuService.reorderMenus(updateDTO);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/shops/{shopId}")
+    public ResponseEntity<List<MenuResponse>> getMenus(@PathVariable("shopId") Long shopId) {
+        return ResponseEntity.ok(menuService.getMenus(shopId));
     }
 }
