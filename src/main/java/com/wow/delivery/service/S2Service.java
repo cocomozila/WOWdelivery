@@ -36,7 +36,7 @@ public class S2Service {
             .toList();
     }
 
-    public boolean isPopulatedArea(String state) {
-        return POPULATED_STREET_NAMES.contains(state);
+    public boolean isPopulatedStreetName(String streetName) {
+        return POPULATED_STREET_NAMES.contains(streetName);
     }
 }

@@ -85,7 +85,7 @@ public class ShopService {
                                                     BiFunction<List<String>, T, List<ShopEntity>> populatedAreaMethod,
                                                     BiFunction<List<String>, T, List<ShopEntity>> nonPopulatedAreaMethod,
                                                     T searchParameter) {
-        if (s2Service.isPopulatedArea(requestDTO.getState())) {
+        if (s2Service.isPopulatedStreetName(requestDTO.getStreetName())) {
             List<String> tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
             return populatedAreaMethod.apply(tokens, searchParameter);
         }
