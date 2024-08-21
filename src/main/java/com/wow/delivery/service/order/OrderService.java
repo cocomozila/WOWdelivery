@@ -182,7 +182,7 @@ public class OrderService {
     @Transactional
     public void pickupOrder(OrderDeliveryDTO orderDeliveryDTO) {
         OrderEntity order = orderRepository.findByIdOrThrow(orderDeliveryDTO.getOrderId(), ErrorCode.ORDER_DATA_NOT_FOUND, null);
-        Long apply = appliedRiderRepository.addRider(orderDeliveryDTO.getOrderId(), orderDeliveryDTO.getRiderId());
+        Long apply = appliedRiderRepository.addRider(orderDeliveryDTO.getOrderId());
         if (apply != 1) {
             throw new OrderException(ErrorCode.DUPLICATE_DATA, "이미 배차가 완료된 주문입니다.");
         }
