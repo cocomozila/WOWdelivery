@@ -21,7 +21,7 @@ public class OrderEntity extends BaseEntity {
     @Comment(value = "가게 ID")
     private Long shopId;
 
-    @Comment(value = "라이더 ID")
+    @Comment(value = "담당 라이더 ID")
     private Long riderId;
 
     @Comment(value = "거래 ID")
@@ -29,7 +29,8 @@ public class OrderEntity extends BaseEntity {
 
     @Comment(value = "배달 받을 주소")
     @Embedded
-    private Address address;
+    @Column(nullable = false)
+    private Address destination;
 
     @Comment(value = "주문 번호")
     @Column(name = "order_number", columnDefinition = "VARCHAR(10)", nullable = false)
@@ -61,8 +62,8 @@ public class OrderEntity extends BaseEntity {
     private Long couponId;
 
     @Builder
-    public OrderEntity(Address address, Long userId, Long shopId, Long paymentId, String orderRequest, Long orderPrice, Long deliveryFee, Long totalPaymentAmount, Long couponId) {
-        this.address = address;
+    public OrderEntity(Address destination, Long userId, Long shopId, Long paymentId, String orderRequest, Long orderPrice, Long deliveryFee, Long totalPaymentAmount, Long couponId) {
+        this.destination = destination;
         this.userId = userId;
         this.shopId = shopId;
         this.paymentId = paymentId;
@@ -85,5 +86,9 @@ public class OrderEntity extends BaseEntity {
 
     public boolean isCancelAbleStatus() {
         return this.getOrderStatus().equals(OrderStatus.CONFIRMING);
+    }
+
+    public void assignRider(Long riderId) {
+        this.riderId = riderId;
     }
 }

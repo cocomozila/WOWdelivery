@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NearbyShopRequestDTO {
 
-    private Long userId; // 가게사장 식별번호
+    private Long userId; // 유저 ID
     private String state; // 주소(도)
     private String city; // 주소(시)
     private String district; // 주소(구,군)
