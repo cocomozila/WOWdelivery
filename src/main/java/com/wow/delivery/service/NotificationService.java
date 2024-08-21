@@ -25,4 +25,16 @@ public class NotificationService {
         // 앱으로 알림 전송
         log.info("해당 유저에게 주문 실패 카카오 알림 전송 : {} ", shopId);
     }
+
+    public void sendKakaoOrderPickupNotification(Long orderId) {
+        // 비동기로 작성
+        // 앱으로 알림 전송
+        log.info("배달 픽업 카카오 알림 전송 : {} ", orderId);
+    }
+
+    public void sendKakaoOrderDeliveredNotification(Long orderId) {
+        // 비동기로 작성
+        // 앱으로 알림 전송
+        log.info("배달 완료 카카오 알림 전송 : {} ", orderId);
+    }
 }

@@ -36,6 +36,7 @@ public enum ErrorCode {
     // EXPIRE
     EXPIRE_DATA("만료된 데이터 입니다.");
 
+
     private final String message;
 
     ErrorCode(String message) {

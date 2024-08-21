@@ -1,9 +1,6 @@
 package com.wow.delivery.service.order;
 
-import com.wow.delivery.dto.order.OrderAcceptDTO;
-import com.wow.delivery.dto.order.OrderCancelDTO;
-import com.wow.delivery.dto.order.OrderCreateDTO;
-import com.wow.delivery.dto.order.OrderResponse;
+import com.wow.delivery.dto.order.*;
 import com.wow.delivery.dto.order.details.OrderDetailsResponse;
 import com.wow.delivery.entity.UserEntity;
 import com.wow.delivery.entity.order.OrderDetailsEntity;
@@ -18,10 +15,8 @@ import com.wow.delivery.error.exception.OrderException;
 import com.wow.delivery.error.exception.PaymentException;
 import com.wow.delivery.kafka.KafkaTopics;
 import com.wow.delivery.kafka.producer.OrderProducer;
-import com.wow.delivery.repository.OrderDetailsRepository;
-import com.wow.delivery.repository.OrderRepository;
-import com.wow.delivery.repository.PaymentRepository;
-import com.wow.delivery.repository.UserRepository;
+import com.wow.delivery.repository.*;
+import com.wow.delivery.service.S2Service;
 import com.wow.delivery.service.ShopService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.retry.annotation.Backoff;
@@ -42,6 +37,8 @@ public class OrderService {
     private final ShopService shopService;
     private final OrderDetailsRepository orderDetailsRepository;
     private final OrderProducer orderProducer;
+    private final S2Service s2Service;
+    private final AppliedRiderRepository appliedRiderRepository;
 
     @Transactional
     @Retryable(retryFor = InvalidParameterException.class, backoff = @Backoff(delay = 300))
@@ -55,7 +52,7 @@ public class OrderService {
             .userId(userEntity.getIdOrThrow())
             .shopId(shopEntity.getIdOrThrow())
             .paymentId(paymentEntity.getIdOrThrow())
-            .address(createDTO.getAddress())
+            .destination(createDTO.getAddress())
             .orderRequest(createDTO.getOrderRequest())
             .orderPrice(createDTO.getOrderPrice())
             .deliveryFee(createDTO.getDeliveryFee())
@@ -92,7 +89,7 @@ public class OrderService {
             .orderStatus(saveOrderEntity.getOrderStatus())
             .orderRequest(saveOrderEntity.getOrderRequest())
             .orderPrice(saveOrderEntity.getOrderPrice())
-            .address(saveOrderEntity.getAddress())
+            .address(saveOrderEntity.getDestination())
             .deliveryFee(saveOrderEntity.getDeliveryFee())
             .totalPaymentAmount(saveOrderEntity.getTotalPaymentAmount())
             .orderDetailsResponses(orderDetailsResponses)
@@ -168,6 +165,43 @@ public class OrderService {
         orderProducer.sendEvent(KafkaTopics.REJECT_ORDER, orderAcceptDTO);
     }
 
+    @Transactional(readOnly = true)
+    public List<OrderDeliveryResponse> getNearbyOrder(NearbyOrderRequestDTO requestDTO) {
+        List<String> tokens;
+        List<OrderDeliveryResponse> orders;
+        if (s2Service.isPopulatedStreetName(requestDTO.getStreetName())) {
+            tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
+            orders = orderRepository.findNearbyOrderLevel13(tokens);
+        } else {
+            tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
+            orders = orderRepository.findNearbyOrderLevel12(tokens);
+        }
+        return orders;
+    }
+
+    @Transactional
+    public void pickupOrder(OrderDeliveryDTO orderDeliveryDTO) {
+        OrderEntity order = orderRepository.findByIdOrThrow(orderDeliveryDTO.getOrderId(), ErrorCode.ORDER_DATA_NOT_FOUND, null);
+        Long apply = appliedRiderRepository.addRider(orderDeliveryDTO.getOrderId(), orderDeliveryDTO.getRiderId());
+        if (apply != 1) {
+            throw new OrderException(ErrorCode.DUPLICATE_DATA, "이미 배차가 완료된 주문입니다.");
+        }
+        order.updateOrderStatus(OrderStatus.DELIVERING);
+        order.assignRider(orderDeliveryDTO.getRiderId());
+        orderProducer.sendEvent(KafkaTopics.PICKUP_ORDER, orderDeliveryDTO);
+    }
+
+    @Transactional
+    public void deliveredOrder(OrderDeliveryDTO orderDeliveryDTO) {
+        OrderEntity order = orderRepository.findByIdOrThrow(orderDeliveryDTO.getOrderId(), ErrorCode.ORDER_DATA_NOT_FOUND, null);
+        if (order.getRiderId().equals(orderDeliveryDTO.getRiderId()) && order.getOrderStatus().equals(OrderStatus.DELIVERING)) {
+            order.updateOrderStatus(OrderStatus.DELIVERED);
+            orderProducer.sendEvent(KafkaTopics.DELIVERED_ORDER, orderDeliveryDTO);
+            return;
+        }
+        throw new OrderException(ErrorCode.STATUS_CHANGE_NOT_ALLOWED, "배달 중인 주문만 배달완료 할 수 있습니다.");
+    }
+
     // todo
     // 1. 결제 프로세스를 마친 유저가 주문을 생성
     // 2. 메세지 큐(카프카)에 주문 정보를 넣는다.
@@ -175,10 +209,23 @@ public class OrderService {
     // 4. 주문 알림 서비스를 통해 가게 사장에게 주문 알림이 도착한다.
     // 5. 가게 사장은 주문을 승낙할지 거부할지 선택한다.
     //    5-1 (승낙) 가게 사장은 주문 상태를 PREPARING(준비중) 으로 변경한다.
+    //       X -> 조리시간을 기입할 수 있다. (입력한 조리시간과 계산된 배달시간을 참고해서 유저에게 "배달예상시간"을 안내한다)
+    //       O -> 배달 방법을 선택할 수 있다. 1.배달 대행사, 2.직접 배달, 3.잠시후 선택 (그러나 우리는 자동으로 1.배달 대행사만 구현한다)
+    //       X -> 픽업 요청 시간을 선택할 수 있다. (10분 후, 15분 후 등등) 단, 고객에게 전달된 "배달예상시간"은 변경되지 않는다.
+    //         -> 배차완료가 된 후에는 주문이 취소되어도 배달 취소가 불가능하다.
     //    5-2 (거부) 가게 사장은 주문 상태를 CANCELED(취소) 으로 변경한다.
     //    5-3  가게 사장이 주문상태를 변경하기 전 유저는 주문을 취소할 수 있다.
-    // 6. (5-1 이후) 유저에게 카카오 알림톡을 보낸다 [주문이 완료되었습니다. 주문 번호는 0000입니다. 결제 금액은 0000원 입니다.]
+    // 6. (5-1 이후) 유저에게 카카오 알림톡을 보낸다 [주문이 완료되었습니다. 주문 번호는 0000입니다. 결제 금액은 0000원 입니다
+    // .]
     // 7. 가게사장의 주문 승낙 이후, 라이더의 "배달 운행" 시작 시, 가게의 배달 요청 아이콘이 지도에 표시된다.
     // 8. 라이더는 가게의 배달 요청 아이콘을 클릭하여 접수가 가능하고, 주문에 라이더 ID를 업데이트 해준다.
     // 이벤트리스너만으로 활용해도 좋다.
+
+    // 배달 프로세스
+    // 1. 라이더가 근처 지역의 '준비중' 상태의 주문을 조회한다.
+    // 2. '준비중' 상태의 근처 가게의 주문목록이 나온다.
+    // 3. 라이더가 근처 '준비중' 상태의 주문목록을 하나 선택하여 배차받는다.
+    // 4. 배차받았다고 가게 사장에게 알람이 간다.
+    // 5. 라이더가 배차를 받고 주문의 상태를 '배달중'으로 변경한다.
+    // 6. 라이더가 주문을 완료하고 '배달완료' 상태로 변경한다.
 }
