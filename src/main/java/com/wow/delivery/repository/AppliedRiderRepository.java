@@ -10,8 +10,8 @@ public class AppliedRiderRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    public Long addRider(Long orderId, Long riderId) {
+    public Long addRider(Long orderId) {
         return redisTemplate.opsForSet()
-            .add(orderId.toString(), riderId.toString());
+            .add(orderId.toString(), "assingRider");
     }
 }
