@@ -29,7 +29,6 @@ public class OrderEntity extends BaseEntity {
 
     @Comment(value = "배달 받을 주소")
     @Embedded
-    @Column(nullable = false)
     private Address destination;
 
     @Comment(value = "주문 번호")
@@ -90,5 +89,13 @@ public class OrderEntity extends BaseEntity {
 
     public void assignRider(Long riderId) {
         this.riderId = riderId;
+    }
+
+    public boolean isSameRider(Long riderId) {
+        return this.riderId.equals(riderId);
+    }
+
+    public boolean isDelivering() {
+        return this.orderStatus == OrderStatus.DELIVERING;
     }
 }

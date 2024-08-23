@@ -2,6 +2,7 @@ package com.wow.delivery.service.order;
 
 import com.wow.delivery.dto.order.*;
 import com.wow.delivery.dto.order.details.OrderDetailsResponse;
+import com.wow.delivery.entity.RiderEntity;
 import com.wow.delivery.entity.UserEntity;
 import com.wow.delivery.entity.order.OrderDetailsEntity;
 import com.wow.delivery.entity.order.OrderEntity;
@@ -39,6 +40,7 @@ public class OrderService {
     private final OrderProducer orderProducer;
     private final S2Service s2Service;
     private final AppliedRiderRepository appliedRiderRepository;
+    private final RiderRepository riderRepository;
 
     @Transactional
     @Retryable(retryFor = InvalidParameterException.class, backoff = @Backoff(delay = 300))
@@ -167,40 +169,39 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<OrderDeliveryResponse> getNearbyOrder(NearbyOrderRequestDTO requestDTO) {
-        List<String> tokens;
-        List<OrderDeliveryResponse> orders;
         if (s2Service.isPopulatedStreetName(requestDTO.getStreetName())) {
-            tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
-            orders = orderRepository.findNearbyOrderLevel13(tokens);
-        } else {
-            tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
-            orders = orderRepository.findNearbyOrderLevel12(tokens);
+            List<String> tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 2000, 13);
+            return orderRepository.findNearbyOrderLevel13(tokens);
         }
-        return orders;
+        List<String> tokens = s2Service.getNearbyCellIdTokens(requestDTO.getLatitude(), requestDTO.getLongitude(), 4000, 12);
+        return orderRepository.findNearbyOrderLevel12(tokens);
     }
 
     @Transactional
     public void pickupOrder(OrderDeliveryDTO orderDeliveryDTO) {
         OrderEntity order = orderRepository.findByIdOrThrow(orderDeliveryDTO.getOrderId(), ErrorCode.ORDER_DATA_NOT_FOUND, null);
-        Long apply = appliedRiderRepository.addRider(orderDeliveryDTO.getOrderId());
+        RiderEntity rider = riderRepository.findByIdOrThrow(orderDeliveryDTO.getRiderId(), ErrorCode.RIDER_DATA_NOT_FOUND, null);
+        Long apply = appliedRiderRepository.addRider(order.getIdOrThrow());
         if (apply != 1) {
             throw new OrderException(ErrorCode.DUPLICATE_DATA, "이미 배차가 완료된 주문입니다.");
         }
         order.updateOrderStatus(OrderStatus.DELIVERING);
-        order.assignRider(orderDeliveryDTO.getRiderId());
+        order.assignRider(rider.getIdOrThrow());
         orderProducer.sendEvent(KafkaTopics.PICKUP_ORDER, orderDeliveryDTO);
     }
 
     @Transactional
     public void deliveredOrder(OrderDeliveryDTO orderDeliveryDTO) {
         OrderEntity order = orderRepository.findByIdOrThrow(orderDeliveryDTO.getOrderId(), ErrorCode.ORDER_DATA_NOT_FOUND, null);
-        if (order.getRiderId().equals(orderDeliveryDTO.getRiderId()) && order.getOrderStatus().equals(OrderStatus.DELIVERING)) {
+        if (order.isSameRider(orderDeliveryDTO.getRiderId()) && order.isDelivering()) {
             order.updateOrderStatus(OrderStatus.DELIVERED);
             orderProducer.sendEvent(KafkaTopics.DELIVERED_ORDER, orderDeliveryDTO);
             return;
         }
         throw new OrderException(ErrorCode.STATUS_CHANGE_NOT_ALLOWED, "배달 중인 주문만 배달완료 할 수 있습니다.");
     }
+
+
 
     // todo
     // 1. 결제 프로세스를 마친 유저가 주문을 생성

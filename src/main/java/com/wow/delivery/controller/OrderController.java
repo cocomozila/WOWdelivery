@@ -50,12 +50,14 @@ public class OrderController {
     }
 
     @PostMapping("/pickup")
-    public void pickupOrder(@RequestBody @Valid OrderDeliveryDTO orderDeliveryDTO) {
+    public ResponseEntity<HttpStatus> pickupOrder(@RequestBody @Valid OrderDeliveryDTO orderDeliveryDTO) {
         orderService.pickupOrder(orderDeliveryDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PostMapping("/delivery-complete")
-    public void deliveredOrder(@RequestBody @Valid OrderDeliveryDTO orderDeliveryDTO) {
+    public ResponseEntity<HttpStatus> deliveredOrder(@RequestBody @Valid OrderDeliveryDTO orderDeliveryDTO) {
         orderService.deliveredOrder(orderDeliveryDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
