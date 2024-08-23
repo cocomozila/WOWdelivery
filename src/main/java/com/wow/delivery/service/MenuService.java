@@ -47,7 +47,7 @@ public class MenuService {
     @Transactional(readOnly = true)
     public List<MenuResponse> getMenus(Long shopId) {
         ShopEntity shopEntity = shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
-        List<MenuEntity> answer = menuRepository.findAllByShopIdOrderByMenuOrder(shopEntity.getIdOrThrow());
+        List<MenuEntity> answer = menuRepository.findAllByShopIdOrderByMenuOrderAsc(shopEntity.getIdOrThrow());
         return answer.stream()
             .map(menuEntity -> MenuResponse.builder()
                 .menuId(menuEntity.getIdOrThrow())

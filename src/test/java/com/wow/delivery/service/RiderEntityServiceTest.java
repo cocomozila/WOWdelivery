@@ -3,7 +3,7 @@ package com.wow.delivery.service;
 import com.wow.delivery.dto.common.PasswordEncodingDTO;
 import com.wow.delivery.dto.rider.RiderSigninDTO;
 import com.wow.delivery.dto.rider.RiderSignupDTO;
-import com.wow.delivery.entity.Rider;
+import com.wow.delivery.entity.RiderEntity;
 import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.InvalidParameterException;
 import com.wow.delivery.repository.RiderRepository;
@@ -28,7 +28,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RiderServiceTest {
+class RiderEntityServiceTest {
 
     @InjectMocks
     private RiderService riderService;
@@ -125,7 +125,7 @@ class RiderServiceTest {
             PasswordEncodingDTO passwordEncoder =
                 PasswordEncoder.encodePassword(signupDTO.getPassword());
 
-            Rider rider = Rider.builder()
+            RiderEntity rider = RiderEntity.builder()
                 .email(signupDTO.getEmail())
                 .password(passwordEncoder.getEncodePassword())
                 .salt(passwordEncoder.getSalt())
@@ -187,7 +187,7 @@ class RiderServiceTest {
             PasswordEncodingDTO passwordEncoder =
                 PasswordEncoder.encodePassword(password);
 
-            Rider rider = Rider.builder()
+            RiderEntity rider = RiderEntity.builder()
                 .email("seyun@gmail.com")
                 .password(passwordEncoder.getEncodePassword())
                 .salt(passwordEncoder.getSalt())

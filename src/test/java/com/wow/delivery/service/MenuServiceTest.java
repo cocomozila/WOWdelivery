@@ -173,7 +173,7 @@ class MenuServiceTest {
 
             given(shopRepository.findById(any()))
                 .willReturn(Optional.of(shopEntity));
-            given(menuRepository.findAllByShopIdOrderByMenuOrder(any()))
+            given(menuRepository.findAllByShopIdOrderByMenuOrderAsc(any()))
                 .willReturn(List.of(menuEntity));
 
             // when

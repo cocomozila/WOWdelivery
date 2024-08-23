@@ -1,9 +1,7 @@
 package com.wow.delivery.service;
 
-import com.wow.delivery.dto.order.OrderCancelDTO;
-import com.wow.delivery.dto.order.OrderCart;
-import com.wow.delivery.dto.order.OrderCreateDTO;
-import com.wow.delivery.dto.order.OrderResponse;
+import com.wow.delivery.dto.order.*;
+import com.wow.delivery.entity.RiderEntity;
 import com.wow.delivery.entity.UserEntity;
 import com.wow.delivery.entity.order.OrderDetailsEntity;
 import com.wow.delivery.entity.order.OrderEntity;
@@ -14,10 +12,7 @@ import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.OrderException;
 import com.wow.delivery.error.exception.PaymentException;
 import com.wow.delivery.kafka.producer.OrderProducer;
-import com.wow.delivery.repository.OrderDetailsRepository;
-import com.wow.delivery.repository.OrderRepository;
-import com.wow.delivery.repository.PaymentRepository;
-import com.wow.delivery.repository.UserRepository;
+import com.wow.delivery.repository.*;
 import com.wow.delivery.service.order.OrderService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -62,6 +58,12 @@ class OrderServiceTest {
 
     @Mock
     private OrderProducer orderProducer;
+
+    @Spy
+    private RiderRepository riderRepository;
+
+    @Mock
+    private AppliedRiderRepository appliedRiderRepository;
 
     @Nested
     @DisplayName("생성")
@@ -326,6 +328,212 @@ class OrderServiceTest {
             // when & then
             Assertions.assertThrows(OrderException.class,
                 () -> orderService.cancelOrder(cancelDTO));
+        }
+    }
+
+    @Nested
+    @DisplayName("가게사장 응답")
+    class ResponseOwner {
+
+        @Test
+        @DisplayName("응답 수락")
+        void accept() {
+            // given
+            OrderAcceptDTO dto = OrderAcceptDTO.builder()
+                .orderId(1L)
+                .userId(1L)
+                .build();
+
+            OrderEntity order = OrderEntity.builder()
+                .build();
+
+            order.setId(1L);
+
+            given(orderRepository.findById(any()))
+                .willReturn(Optional.of(order));
+
+            // when
+            orderService.acceptOrder(dto);
+
+            // then
+            assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.PREPARING);
+        }
+
+        @Test
+        @DisplayName("응답 거절")
+        void reject() {
+            // given
+            OrderAcceptDTO dto = OrderAcceptDTO.builder()
+                .orderId(1L)
+                .userId(1L)
+                .build();
+
+            OrderEntity order = OrderEntity.builder()
+                .build();
+
+            order.setId(1L);
+
+            given(orderRepository.findById(any()))
+                .willReturn(Optional.of(order));
+
+            // when
+            orderService.rejectOrder(dto);
+
+            // then
+            assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.CANCELED_OWNER);
+        }
+    }
+
+    @Nested
+    @DisplayName("라이더 관련")
+    class Rider {
+
+        @Test
+        @DisplayName("픽업 성공")
+        void success_pickup() {
+            // given
+            OrderDeliveryDTO dto = OrderDeliveryDTO.builder()
+                .orderId(1L)
+                .riderId(1L)
+                .build();
+
+            OrderEntity order = OrderEntity.builder()
+                .build();
+            order.setId(1L);
+
+            RiderEntity rider = RiderEntity.builder()
+                .build();
+            rider.setId(1L);
+
+            given(orderRepository.findById(any()))
+                .willReturn(Optional.of(order));
+            given(riderRepository.findById(any()))
+                .willReturn(Optional.of(rider));
+            given(appliedRiderRepository.addRider(any()))
+                .willReturn(1L);
+
+            // when
+            orderService.pickupOrder(dto);
+
+            // then
+            assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.DELIVERING);
+            assertThat(order.getRiderId()).isEqualTo(1L);
+        }
+
+        @Test
+        @DisplayName("픽업 실패 - 마감된 배차")
+        void fail_pickup() {
+            // given
+            OrderDeliveryDTO dto = OrderDeliveryDTO.builder()
+                .orderId(1L)
+                .riderId(1L)
+                .build();
+
+            OrderEntity order = OrderEntity.builder()
+                .build();
+            order.setId(1L);
+
+            RiderEntity rider = RiderEntity.builder()
+                .build();
+            rider.setId(1L);
+
+            given(orderRepository.findById(any()))
+                .willReturn(Optional.of(order));
+            given(riderRepository.findById(any()))
+                .willReturn(Optional.of(rider));
+            given(appliedRiderRepository.addRider(any()))
+                .willReturn(0L);
+
+            // when & then
+            assertThatThrownBy(() -> orderService.pickupOrder(dto))
+                .isInstanceOf(OrderException.class)
+                .hasMessage("이미 배차가 완료된 주문입니다.");
+
+        }
+
+        @Test
+        @DisplayName("배달 성공")
+        void success_delivered() {
+            // given
+            OrderDeliveryDTO dto = OrderDeliveryDTO.builder()
+                .orderId(1L)
+                .riderId(1L)
+                .build();
+
+            OrderEntity order = OrderEntity.builder()
+                .build();
+            order.setId(1L);
+            order.assignRider(1L);
+            order.updateOrderStatus(OrderStatus.DELIVERING);
+
+            RiderEntity rider = RiderEntity.builder()
+                .build();
+            rider.setId(1L);
+
+            given(orderRepository.findById(any()))
+                .willReturn(Optional.of(order));
+
+            // when
+            orderService.deliveredOrder(dto);
+
+            // then
+            assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.DELIVERED);
+        }
+
+        @Test
+        @DisplayName("배달 오류 - 라이더가 다름")
+        void fail_delivered() {
+            // given
+            OrderDeliveryDTO dto = OrderDeliveryDTO.builder()
+                .orderId(1L)
+                .riderId(1L)
+                .build();
+
+            OrderEntity order = OrderEntity.builder()
+                .build();
+            order.setId(1L);
+            order.assignRider(2L);
+            order.updateOrderStatus(OrderStatus.DELIVERING);
+
+            RiderEntity rider = RiderEntity.builder()
+                .build();
+            rider.setId(1L);
+
+            given(orderRepository.findById(any()))
+                .willReturn(Optional.of(order));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.deliveredOrder(dto))
+                .isInstanceOf(OrderException.class)
+                .hasMessage("배달 중인 주문만 배달완료 할 수 있습니다.");
+        }
+
+        @Test
+        @DisplayName("배달 오류 - 배달중이 아닌 배달건")
+        void fail_delivered2() {
+            // given
+            OrderDeliveryDTO dto = OrderDeliveryDTO.builder()
+                .orderId(1L)
+                .riderId(1L)
+                .build();
+
+            OrderEntity order = OrderEntity.builder()
+                .build();
+            order.setId(1L);
+            order.assignRider(1L);
+            order.updateOrderStatus(OrderStatus.PREPARING);
+
+            RiderEntity rider = RiderEntity.builder()
+                .build();
+            rider.setId(1L);
+
+            given(orderRepository.findById(any()))
+                .willReturn(Optional.of(order));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.deliveredOrder(dto))
+                .isInstanceOf(OrderException.class)
+                .hasMessage("배달 중인 주문만 배달완료 할 수 있습니다.");
         }
     }
 }

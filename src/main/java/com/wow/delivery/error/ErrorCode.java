@@ -20,6 +20,7 @@ public enum ErrorCode {
     ORDER_DATA_NOT_FOUND("주문 데이터를 찾을 수 없습니다."),
     ORDER_DETAILS_NOT_FOUND("상세 주문 데이터를 찾을 수 없습니다."),
     COUPON_DATA_NOT_FOUND("쿠폰 데이터를 찾을 수 없습니다."),
+    RIDER_DATA_NOT_FOUND("라이더 데이터를 찾을 수 없습니다."),
 
     // Parameter
     INVALID_PARAMETER("유효하지 않은 입력 값입니다."),
@@ -35,6 +36,7 @@ public enum ErrorCode {
 
     // EXPIRE
     EXPIRE_DATA("만료된 데이터 입니다.");
+
 
     private final String message;
 

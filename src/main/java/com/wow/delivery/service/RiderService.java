@@ -4,7 +4,7 @@ import com.wow.delivery.dto.common.PasswordEncodingDTO;
 import com.wow.delivery.dto.rider.RiderSigninDTO;
 import com.wow.delivery.dto.rider.RiderSigninResponse;
 import com.wow.delivery.dto.rider.RiderSignupDTO;
-import com.wow.delivery.entity.Rider;
+import com.wow.delivery.entity.RiderEntity;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.error.exception.InvalidParameterException;
@@ -28,7 +28,7 @@ public class RiderService {
         validDuplicateRider(riderSignupDTO);
         PasswordEncodingDTO passwordEncoder =
             PasswordEncoder.encodePassword(riderSignupDTO.getPassword());
-        Rider rider = Rider.builder()
+        RiderEntity rider = RiderEntity.builder()
             .email(riderSignupDTO.getEmail())
             .password(passwordEncoder.getEncodePassword())
             .salt(passwordEncoder.getSalt())
@@ -39,7 +39,7 @@ public class RiderService {
 
     @Transactional(readOnly = true)
     public RiderSigninResponse signin(RiderSigninDTO userSigninDTO, HttpSession session) {
-        Rider rider = riderRepository.getByEmail(userSigninDTO.getEmail());
+        RiderEntity rider = riderRepository.getByEmail(userSigninDTO.getEmail());
         if (!PasswordEncoder.matchesPassword(userSigninDTO.getPassword(), rider.getPassword(), rider.getSalt())) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "일치하는 계정을 찾을 수 없습니다.");
         }

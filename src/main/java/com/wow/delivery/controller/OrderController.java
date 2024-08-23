@@ -1,15 +1,14 @@
 package com.wow.delivery.controller;
 
-import com.wow.delivery.dto.order.OrderAcceptDTO;
-import com.wow.delivery.dto.order.OrderCancelDTO;
-import com.wow.delivery.dto.order.OrderCreateDTO;
-import com.wow.delivery.dto.order.OrderResponse;
+import com.wow.delivery.dto.order.*;
 import com.wow.delivery.service.order.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -35,7 +34,7 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/accecpt")
+    @PostMapping("/accept")
     public void acceptOrder(@RequestBody @Valid OrderAcceptDTO orderAcceptDTO) {
         orderService.acceptOrder(orderAcceptDTO);
     }
@@ -43,5 +42,22 @@ public class OrderController {
     @PostMapping("/reject")
     public void rejectOrder(@RequestBody @Valid OrderAcceptDTO orderAcceptDTO) {
         orderService.rejectOrder(orderAcceptDTO);
+    }
+
+    @GetMapping("/nearby")
+    public ResponseEntity<List<OrderDeliveryResponse>> getOrders(@RequestBody @Valid NearbyOrderRequestDTO requestDTO) {
+        return ResponseEntity.ok(orderService.getNearbyOrder(requestDTO));
+    }
+
+    @PostMapping("/pickup")
+    public ResponseEntity<HttpStatus> pickupOrder(@RequestBody @Valid OrderDeliveryDTO orderDeliveryDTO) {
+        orderService.pickupOrder(orderDeliveryDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PostMapping("/delivery-complete")
+    public ResponseEntity<HttpStatus> deliveredOrder(@RequestBody @Valid OrderDeliveryDTO orderDeliveryDTO) {
+        orderService.deliveredOrder(orderDeliveryDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
