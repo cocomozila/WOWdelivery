@@ -46,8 +46,17 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 	// jackson-datatype-jsr310
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	// 스프링 캐시
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.6'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+apply plugin: 'java'
+
+compileJava {
+	options.compilerArgs << '-parameters'
 }

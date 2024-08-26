@@ -10,6 +10,8 @@ import com.wow.delivery.repository.OwnerRepository;
 import com.wow.delivery.repository.ShopCategoryRepository;
 import com.wow.delivery.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -93,11 +95,15 @@ public class ShopService {
         return nonPopulatedAreaMethod.apply(tokens, searchParameter);
     }
 
+    @CacheEvict(
+        key = "#p0.shopId",
+        value = "getShopCache"
+    )
     @Transactional
     public void updateShop(ShopUpdateDTO shopUpdateDTO) {
-        ShopEntity shopEntity = findByShopIdOrThrow(shopUpdateDTO.getShopId());
+        ShopEntity shop = findByShopIdOrThrow(shopUpdateDTO.getShopId());
 
-        shopEntity.update(
+        shop.update(
             shopUpdateDTO.getShopName(),
             shopUpdateDTO.getIntroduction(),
             BusinessHours.builder()
@@ -121,6 +127,9 @@ public class ShopService {
         );
     }
 
+    @Cacheable(
+        value = "getShopCache"
+    )
     @Transactional(readOnly = true)
     public ShopResponse getShop(Long shopId) {
         ShopEntity shopEntity = findByShopIdOrThrow(shopId);
@@ -146,6 +155,9 @@ public class ShopService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(
+        value = "shopEntityCache"
+    )
     public ShopEntity findByShopIdOrThrow(Long shopId) {
         return shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
     }
