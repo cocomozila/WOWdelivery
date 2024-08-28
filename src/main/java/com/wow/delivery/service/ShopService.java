@@ -96,7 +96,7 @@ public class ShopService {
     }
 
     @CacheEvict(
-        key = "#p0.shopId",
+        key = "#shopUpdateDTO.shopId",
         value = "getShopCache"
     )
     @Transactional
@@ -128,6 +128,7 @@ public class ShopService {
     }
 
     @Cacheable(
+        key = "#shopId",
         value = "getShopCache"
     )
     @Transactional(readOnly = true)
@@ -156,6 +157,7 @@ public class ShopService {
 
     @Transactional(readOnly = true)
     @Cacheable(
+        key = "#shopId",
         value = "shopEntityCache"
     )
     public ShopEntity findByShopIdOrThrow(Long shopId) {
