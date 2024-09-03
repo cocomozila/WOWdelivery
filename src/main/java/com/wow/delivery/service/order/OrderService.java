@@ -18,7 +18,7 @@ import com.wow.delivery.kafka.KafkaTopics;
 import com.wow.delivery.kafka.producer.OrderProducer;
 import com.wow.delivery.repository.*;
 import com.wow.delivery.service.S2Service;
-import com.wow.delivery.service.ShopService;
+import com.wow.delivery.service.shop.ShopCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -35,18 +35,18 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
-    private final ShopService shopService;
     private final OrderDetailsRepository orderDetailsRepository;
     private final OrderProducer orderProducer;
     private final S2Service s2Service;
     private final AppliedRiderRepository appliedRiderRepository;
     private final RiderRepository riderRepository;
+    private final ShopCacheService shopCacheService;
 
     @Transactional
     @Retryable(retryFor = InvalidParameterException.class, backoff = @Backoff(delay = 300))
     public void createOrder(OrderCreateDTO createDTO) {
         UserEntity userEntity = userRepository.findByIdOrThrow(createDTO.getUserId(), ErrorCode.USER_DATA_NOT_FOUND, null);
-        ShopEntity shopEntity = shopService.findByShopIdOrThrow(createDTO.getShopId());
+        ShopEntity shopEntity = shopCacheService.findByShopIdOrThrow(createDTO.getShopId());
         PaymentEntity paymentEntity = paymentRepository.findByTransactionIdOrThrow(createDTO.getTransactionId());
         validPayment(paymentEntity, createDTO);
 

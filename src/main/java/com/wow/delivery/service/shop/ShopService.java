@@ -1,4 +1,4 @@
-package com.wow.delivery.service;
+package com.wow.delivery.service.shop;
 
 import com.wow.delivery.dto.shop.*;
 import com.wow.delivery.entity.OwnerEntity;
@@ -9,9 +9,8 @@ import com.wow.delivery.repository.MetaCategoryRepository;
 import com.wow.delivery.repository.OwnerRepository;
 import com.wow.delivery.repository.ShopCategoryRepository;
 import com.wow.delivery.repository.ShopRepository;
+import com.wow.delivery.service.S2Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +26,7 @@ public class ShopService {
     private final MetaCategoryRepository metaCategoryRepository;
     private final OwnerRepository ownerRepository;
     private final S2Service s2Service;
+    private final ShopCacheService shopCacheService;
 
     @Transactional
     public void createShop(ShopCreateDTO shopCreateDTO) {
@@ -57,7 +57,7 @@ public class ShopService {
             .s2LevelToken(new S2LevelToken(shopCreateDTO.getLatitude(), shopCreateDTO.getLongitude()))
             .build();
 
-        shopRepository.save(shopEntity);
+        shopCacheService.saveShop(shopEntity);
 
         List<ShopCategoryEntity> shopCategories = buildShopCategories(shopCreateDTO.getCategoryNames(), shopEntity.getId());
         shopCategoryRepository.saveAll(shopCategories);
@@ -95,13 +95,9 @@ public class ShopService {
         return nonPopulatedAreaMethod.apply(tokens, searchParameter);
     }
 
-    @CacheEvict(
-        key = "#shopUpdateDTO.shopId",
-        value = "getShopCache"
-    )
     @Transactional
     public void updateShop(ShopUpdateDTO shopUpdateDTO) {
-        ShopEntity shop = findByShopIdOrThrow(shopUpdateDTO.getShopId());
+        ShopEntity shop = shopCacheService.findByShopIdOrThrow(shopUpdateDTO.getShopId());
 
         shop.update(
             shopUpdateDTO.getShopName(),
@@ -125,15 +121,12 @@ public class ShopService {
             shopUpdateDTO.getDeliveryFee(),
             new S2LevelToken(shopUpdateDTO.getLatitude(), shopUpdateDTO.getLongitude())
         );
+        shopCacheService.saveShop(shop);
     }
 
-    @Cacheable(
-        key = "#shopId",
-        value = "getShopCache"
-    )
     @Transactional(readOnly = true)
     public ShopResponse getShop(Long shopId) {
-        ShopEntity shopEntity = findByShopIdOrThrow(shopId);
+        ShopEntity shopEntity = shopCacheService.findByShopIdOrThrow(shopId);
 
         return ShopResponse.builder()
             .shopName(shopEntity.getShopName())
@@ -153,14 +146,5 @@ public class ShopService {
                 .metaCategoryId(m.getId())
                 .build())
             .toList();
-    }
-
-    @Transactional(readOnly = true)
-    @Cacheable(
-        key = "#shopId",
-        value = "shopEntityCache"
-    )
-    public ShopEntity findByShopIdOrThrow(Long shopId) {
-        return shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
     }
 }

@@ -3,10 +3,12 @@ package com.wow.delivery.entity.shop;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
 @Embeddable
+@Getter
 @NoArgsConstructor
 public class BusinessHours {
 
