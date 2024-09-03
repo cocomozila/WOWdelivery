@@ -11,14 +11,18 @@ import com.wow.delivery.repository.MetaCategoryRepository;
 import com.wow.delivery.repository.OwnerRepository;
 import com.wow.delivery.repository.ShopCategoryRepository;
 import com.wow.delivery.repository.ShopRepository;
+import com.wow.delivery.service.shop.ShopService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 
 import java.time.DayOfWeek;
 import java.util.List;
@@ -50,6 +54,28 @@ class ShopServiceTest {
 
     @Spy
     private OwnerRepository ownerRepository;
+
+    @Mock
+    private CacheManager cacheManager;
+
+    @Mock
+    private Cache cache;
+
+//    @BeforeEach
+//    void setUpCache(TestInfo testInfo) {
+//        if (testInfo.getDisplayName().equals("일반 조회 - 캐시에 이미 데이터가 있음")) {
+//            ShopEntity shopEntity = ShopEntity.builder()
+//                .ownerId(1L)
+//                .shopName("일산 맛집식당")
+//                .build();
+//            shopEntity.setId(1L);
+//
+//            given(shopRepository.findById(any()))
+//                .willReturn(Optional.of(shopEntity));
+//            given(cacheManager.getCache("shopEntityCache"))
+//                .willReturn(cache);
+//        }
+//    }
 
     @Nested
     @DisplayName("생성")
@@ -218,6 +244,49 @@ class ShopServiceTest {
 
             // then
             Assertions.assertThat(shops.size()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("일반 조회 - 캐시에 이미 데이터가 있음")
+        void success_cache_search() {
+            // given
+            ShopEntity shopEntity = ShopEntity.builder()
+                .ownerId(1L)
+                .shopName("일산 맛집식당")
+                .introduction("주말에 커피와 간식을 즐길 수 있는 아늑한 장소입니다.")
+                .businessHours(BusinessHours.builder()
+                    .openTime("11:30")
+                    .closeTime("21:00")
+                    .build())
+                .minOrderPrice(12000)
+                .address(Address.builder()
+                    .state("경기도")
+                    .city("고양시")
+                    .district("덕양구")
+                    .streetName("화정로")
+                    .buildingNumber("53")
+                    .addressDetail("102호")
+                    .latitude(126.8319146)
+                    .longitude(37.6351911)
+                    .build())
+                .openDays(List.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY))
+                .s2LevelToken(new S2LevelToken(126.8319146, 37.6351911))
+                .build();
+
+            shopEntity.setId(1L);
+
+            given(shopRepository.findById(any()))
+                .willReturn(Optional.of(shopEntity));
+
+            // when
+            shopService.getShop(1L);
+
+            // then 1
+            cache.put(1L, shopEntity);
+            shopService.getShop(1L);
+
+            // then
+            then(shopRepository).should(times(2)).findById(any());
         }
     }
 
