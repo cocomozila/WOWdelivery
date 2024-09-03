@@ -1,7 +1,12 @@
 package com.wow.delivery.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.DataNotFoundException;
+import com.wow.delivery.util.CustomInstantDeserializer;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
@@ -21,12 +26,17 @@ public abstract class BaseEntity implements Serializable {
 
     @CreatedDate
     @Column(name = "date_created", columnDefinition = "DATETIME(6)", nullable = false)
+    @JsonSerialize(using = InstantSerializer.class)
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
     private Instant dateCreated;
 
     @LastModifiedDate
     @Column(name = "date_updated", columnDefinition = "DATETIME(6)", nullable = false)
+    @JsonSerialize(using = InstantSerializer.class)
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
     private Instant dateUpdated;
 
+    @JsonIgnore
     public Long getIdOrThrow() {
         if (id == null) {
             throw new DataNotFoundException(ErrorCode.DATA_NOT_FOUND, "ID가 존재하지 않습니다.");
@@ -34,6 +44,7 @@ public abstract class BaseEntity implements Serializable {
         return id;
     }
 
+    @JsonIgnore
     public void setId(Long id) {
         this.id = id;
     }

@@ -1,7 +1,8 @@
 package com.wow.delivery.controller;
 
 import com.wow.delivery.dto.shop.*;
-import com.wow.delivery.service.ShopService;
+import com.wow.delivery.service.shop.ShopCacheService;
+import com.wow.delivery.service.shop.ShopService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 public class ShopController {
 
     private final ShopService shopService;
+    private final ShopCacheService shopCacheService;
 
     @PostMapping
     public ResponseEntity<HttpStatus> register(@RequestBody @Valid ShopCreateDTO shopCreateDTO) {
