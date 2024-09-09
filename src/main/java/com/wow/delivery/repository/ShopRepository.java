@@ -1,6 +1,7 @@
 package com.wow.delivery.repository;
 
 import com.wow.delivery.entity.shop.ShopEntity;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -43,4 +44,12 @@ public interface ShopRepository extends CustomJpaRepository<ShopEntity, Long> {
     """)
     List<ShopEntity> findByShopNameNearbyShopLevel13(@Param("tokens") List<String> tokens,
                                                      @Param("shopName")String shopName);
+
+    @Override
+    @CacheEvict(
+        key = "#entity.id",
+        value = "shopEntityCache",
+        cacheManager = "redisCacheManager"
+    )
+    <S extends ShopEntity> S save(S entity);
 }

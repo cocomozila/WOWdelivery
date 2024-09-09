@@ -26,7 +26,6 @@ public class ShopService {
     private final MetaCategoryRepository metaCategoryRepository;
     private final OwnerRepository ownerRepository;
     private final S2Service s2Service;
-    private final ShopCacheService shopCacheService;
 
     @Transactional
     public void createShop(ShopCreateDTO shopCreateDTO) {
