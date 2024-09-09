@@ -7,7 +7,6 @@ import com.wow.delivery.entity.menu.MenuCategoryEntity;
 import com.wow.delivery.entity.shop.ShopEntity;
 import com.wow.delivery.repository.MenuCategoryRepository;
 import com.wow.delivery.repository.ShopRepository;
-import com.wow.delivery.service.shop.ShopCacheService;
 import com.wow.delivery.service.shop.ShopService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -42,9 +41,6 @@ class MenuCategoryServiceTest {
     @Mock
     private ShopService shopService;
 
-    @Mock
-    private ShopCacheService shopCacheService;
-
     @Nested
     @DisplayName("생성")
     class Create {
@@ -70,7 +66,7 @@ class MenuCategoryServiceTest {
             menuCategoryEntity.setId(1L);
             menuCategoryEntity.createCategoryOrder();
 
-            given(shopCacheService.findByShopIdOrThrow(1L))
+            given(shopService.findByShopIdOrThrow(1L))
                 .willReturn(shopEntity);
             given(menuCategoryRepository.save(any()))
                 .willReturn(menuCategoryEntity);
@@ -109,7 +105,7 @@ class MenuCategoryServiceTest {
                 .build();
             menuCategoryEntity2.setId(2L);
 
-            given(shopCacheService.findByShopIdOrThrow(1L))
+            given(shopService.findByShopIdOrThrow(1L))
                 .willReturn(shopEntity);
             given(menuCategoryRepository.findAllByShopId(1L))
                 .willReturn(Optional.of(List.of(menuCategoryEntity1, menuCategoryEntity2)));

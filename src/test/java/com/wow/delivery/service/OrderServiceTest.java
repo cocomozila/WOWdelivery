@@ -14,7 +14,6 @@ import com.wow.delivery.error.exception.PaymentException;
 import com.wow.delivery.kafka.producer.OrderProducer;
 import com.wow.delivery.repository.*;
 import com.wow.delivery.service.order.OrderService;
-import com.wow.delivery.service.shop.ShopCacheService;
 import com.wow.delivery.service.shop.ShopService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -54,9 +53,6 @@ class OrderServiceTest {
 
     @Mock
     private ShopService shopService;
-
-    @Mock
-    private ShopCacheService shopCacheService;
 
     @Spy
     private OrderDetailsRepository orderDetailsRepository;
@@ -115,7 +111,7 @@ class OrderServiceTest {
 
             given(userRepository.findById(any()))
                 .willReturn(Optional.of(user));
-            given(shopCacheService.findByShopIdOrThrow(any()))
+            given(shopService.findByShopIdOrThrow(any()))
                 .willReturn(shop);
             given(paymentRepository.findByTransactionId(any()))
                 .willReturn(Optional.of(payment));
@@ -175,7 +171,7 @@ class OrderServiceTest {
 
             given(userRepository.findById(any()))
                 .willReturn(Optional.of(user));
-            given(shopCacheService.findByShopIdOrThrow(any()))
+            given(shopService.findByShopIdOrThrow(any()))
                 .willReturn(shop);
             given(paymentRepository.findByTransactionId(any()))
                 .willReturn(Optional.of(payment));

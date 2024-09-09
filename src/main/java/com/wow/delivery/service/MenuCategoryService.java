@@ -9,7 +9,7 @@ import com.wow.delivery.entity.shop.ShopEntity;
 import com.wow.delivery.error.ErrorCode;
 import com.wow.delivery.error.exception.DataNotFoundException;
 import com.wow.delivery.repository.MenuCategoryRepository;
-import com.wow.delivery.service.shop.ShopCacheService;
+import com.wow.delivery.service.shop.ShopService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +24,11 @@ import java.util.stream.IntStream;
 public class MenuCategoryService {
 
     private final MenuCategoryRepository menuCategoryRepository;
-    private final ShopCacheService shopCacheService;
+    private final ShopService shopService;
 
     @Transactional
     public void createMenuCategory(MenuCategoryCreateDTO createDTO) {
-        ShopEntity shopEntity = shopCacheService.findByShopIdOrThrow(createDTO.getShopId());
+        ShopEntity shopEntity = shopService.findByShopIdOrThrow(createDTO.getShopId());
         MenuCategoryEntity menuCategoryEntity = MenuCategoryEntity.builder()
             .shopId(shopEntity.getIdOrThrow())
             .name(createDTO.getName())
@@ -39,7 +39,7 @@ public class MenuCategoryService {
 
     @Transactional(readOnly = true)
     public List<MenuCategoryResponse> getMenuCategory(Long shopId) {
-        ShopEntity shopEntity = shopCacheService.findByShopIdOrThrow(shopId);
+        ShopEntity shopEntity = shopService.findByShopIdOrThrow(shopId);
         return menuCategoryRepository.findAllByShopId(shopEntity.getIdOrThrow())
             .orElseThrow(() -> new DataNotFoundException(ErrorCode.MENU_CATEGORY_NOT_FOUND, "메뉴 카테고리가 존재하지 않습니다."))
             .stream()
