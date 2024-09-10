@@ -12,6 +12,7 @@ import com.wow.delivery.repository.ShopRepository;
 import com.wow.delivery.service.S2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,6 +99,7 @@ public class ShopService {
     @Transactional
     public void updateShop(ShopUpdateDTO shopUpdateDTO) {
         ShopEntity shop = shopRepository.findByIdOrThrow(shopUpdateDTO.getShopId(), ErrorCode.DATA_NOT_FOUND, null);
+      
         shop.update(
             shopUpdateDTO.getShopName(),
             shopUpdateDTO.getIntroduction(),
