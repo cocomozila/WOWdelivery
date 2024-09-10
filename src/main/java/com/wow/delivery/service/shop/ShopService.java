@@ -11,6 +11,8 @@ import com.wow.delivery.repository.ShopCategoryRepository;
 import com.wow.delivery.repository.ShopRepository;
 import com.wow.delivery.service.S2Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +58,7 @@ public class ShopService {
             .s2LevelToken(new S2LevelToken(shopCreateDTO.getLatitude(), shopCreateDTO.getLongitude()))
             .build();
 
-        shopCacheService.saveShop(shopEntity);
+        shopRepository.save(shopEntity);
 
         List<ShopCategoryEntity> shopCategories = buildShopCategories(shopCreateDTO.getCategoryNames(), shopEntity.getId());
         shopCategoryRepository.saveAll(shopCategories);
@@ -96,8 +98,8 @@ public class ShopService {
 
     @Transactional
     public void updateShop(ShopUpdateDTO shopUpdateDTO) {
-        ShopEntity shop = shopCacheService.findByShopIdOrThrow(shopUpdateDTO.getShopId());
-
+        ShopEntity shop = shopRepository.findByIdOrThrow(shopUpdateDTO.getShopId(), ErrorCode.DATA_NOT_FOUND, null);
+      
         shop.update(
             shopUpdateDTO.getShopName(),
             shopUpdateDTO.getIntroduction(),
@@ -120,12 +122,18 @@ public class ShopService {
             shopUpdateDTO.getDeliveryFee(),
             new S2LevelToken(shopUpdateDTO.getLatitude(), shopUpdateDTO.getLongitude())
         );
-        shopCacheService.saveShop(shop);
+        shopRepository.save(shop);
     }
 
+
     @Transactional(readOnly = true)
+    @Cacheable(
+        key = "#shopId",
+        value = "shopEntityCache",
+        cacheManager = "redisCacheManager"
+    )
     public ShopResponse getShop(Long shopId) {
-        ShopEntity shopEntity = shopCacheService.findByShopIdOrThrow(shopId);
+        ShopEntity shopEntity = findByShopIdOrThrow(shopId);
 
         return ShopResponse.builder()
             .shopName(shopEntity.getShopName())
@@ -145,5 +153,10 @@ public class ShopService {
                 .metaCategoryId(m.getId())
                 .build())
             .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ShopEntity findByShopIdOrThrow(Long shopId) {
+        return shopRepository.findByIdOrThrow(shopId, ErrorCode.SHOP_DATA_NOT_FOUND, null);
     }
 }
