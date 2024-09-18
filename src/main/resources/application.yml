@@ -11,7 +11,8 @@ spring:
   # MySQL
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/wowbd
+    url: jdbc:mysql://127.0.0.1:3306/wowbd
+#    url: jdbc:mysql://localhost:3306/wowbd
 
     # DB
     username: root
@@ -34,7 +35,48 @@ spring:
       port: 6379
       password: '1234'
 
+  kafka:
+    bootstrap-servers: localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: kafkaTest
+      auto-offset-reset: latest #가장 최근에 생산된 메시지로 offeset reset
+      enable-auto-commit: true #ack를 자동으로 보내기
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+      # Kafka 클러스터에 대한 초기 연결에 사용할 호스트 : 포트 목록
+      ## serializer 방법은 KafkaProducerConfig 로 설정
+      #      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      #      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 session:
   store-type: redis
   redis:
     namespace: shboard:session
+
+# TOSS_API_TEST_KEY
+test:
+  toss:
+    secret:
+      api:
+        key: 'test_sk_jExPeJWYVQbKnokMJYaxr49R5gvN:'
+    success:
+      callback:
+        url: 'http://localhost:8080/api/payments/success'
+    fail:
+      callback:
+        url: 'http://localhost:8080/api/payments/fail'
+    origin:
+      url: 'https://api.tosspayments.com/v1/payments/'
+
+topic:
+  name: my-topic
+
+warmup:
+  base:
+    url: 'http://localhost:8080'
+  token:
+    key: "verySuperSecretKeyVerySuperSecretKeyVerySuperSecretKeyVerySuperSecretKey"

@@ -196,6 +196,7 @@ public class OrderService {
         if (order.isSameRider(orderDeliveryDTO.getRiderId()) && order.isDelivering()) {
             order.updateOrderStatus(OrderStatus.DELIVERED);
             orderProducer.sendEvent(KafkaTopics.DELIVERED_ORDER, orderDeliveryDTO);
+            appliedRiderRepository.removeRider(order.getIdOrThrow());
             return;
         }
         throw new OrderException(ErrorCode.STATUS_CHANGE_NOT_ALLOWED, "배달 중인 주문만 배달완료 할 수 있습니다.");

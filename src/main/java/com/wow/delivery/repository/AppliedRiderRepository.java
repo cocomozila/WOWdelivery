@@ -14,4 +14,9 @@ public class AppliedRiderRepository {
         return redisTemplate.opsForSet()
             .add(orderId.toString(), "assingRider");
     }
+
+    public Long removeRider(Long orderId) {
+        return redisTemplate.opsForSet()
+            .remove(orderId.toString(), "assingRider");
+    }
 }
