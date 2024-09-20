@@ -1,6 +1,20 @@
 # 와우배달
-전국에 있는 음식점과 소비자와 배달기사를 중개하는 RESTful API 서버
-  
+![대지 3](https://github.com/user-attachments/assets/43ee19c7-c677-4e55-a7bf-5a49d0f96f85)  
+   
+개인 프로젝트로 전국에 있는 음식점과 소비자와 배달기사를 중개하는 RESTful API 서버 입니다.
+
+
+# 사용 기술 및 환경
+- Java 17
+- Spring boot 3.2
+- MySQL 8.0
+- Jpa
+- Redis
+- Docker
+- Kafka
+- Mockito
+- AWS
+- EC2
   
   
   
