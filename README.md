@@ -29,7 +29,7 @@
   
   
 # 프로젝트 전체 구조
-![프로젝트 구조](https://github.com/user-attachments/assets/c3853e54-d0a2-436e-bc7b-04fc83484d08)
+![프로젝트 구조](https://github.com/user-attachments/assets/8874d6e2-92fc-49d2-9378-abfe074deac8)
 # 프로젝트 DB ERD
 위 프로젝트는 JPA의 연관관계 매핑 대신 식별자를 이용한 조회를 선택했기 때문에 테이블간 연결구조는 이해를 돕기 위한 예시입니다.
   
