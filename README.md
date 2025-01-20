@@ -4,7 +4,7 @@
 **개인 프로젝트로 전국에 있는 음식점과 소비자와 배달기사를 중개하는 RESTful API 서버 입니다.**
 - 코드 한 줄에도 이유와 목적이 있도록 작성했습니다.
 
-# 프로젝트 고민사항
+# 프로젝트 고민사항 (링크)
 ### - [가게검색 시 (위도, 경도) 좌표 검색보다 더 효율적인 지리정보 데이터는?](https://destiny-nylon-d49.notion.site/10ac20cd297280d2ac77cd65e79ab7ec?pvs=4)
 ### - [많은 수의 라이더가 동시에 한 가게의 배차 요청을 신청할 경우의 동시성 이슈 해결방법은?](https://destiny-nylon-d49.notion.site/181c20cd2972808aa946ea2221f4fcb4?pvs=4)
 ### - [불필요한 외부 정보 노출을 최소화한 가게번호와 주문번호 전략 고민](https://destiny-nylon-d49.notion.site/120c20cd297280eb87ead81d9ec1d6d6?pvs=4)
