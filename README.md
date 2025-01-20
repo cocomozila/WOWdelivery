@@ -6,7 +6,7 @@
 
 # 프로젝트 고민사항
 ### - [가게검색 시 (위도, 경도) 좌표 검색보다 더 효율적인 지리정보 데이터는?](https://destiny-nylon-d49.notion.site/10ac20cd297280d2ac77cd65e79ab7ec?pvs=4)
-### - 많은 수의 라이더가 동시에 한 가게의 배차 요청을 신청할 경우의 동시성 이슈 해결방법은?
+### - [많은 수의 라이더가 동시에 한 가게의 배차 요청을 신청할 경우의 동시성 이슈 해결방법은?](https://destiny-nylon-d49.notion.site/181c20cd2972808aa946ea2221f4fcb4?pvs=4)
 ### - [불필요한 외부 정보 노출을 최소화한 가게번호와 주문번호 전략 고민](https://destiny-nylon-d49.notion.site/120c20cd297280eb87ead81d9ec1d6d6?pvs=4)
 ### - 피크 시간대 대규모 트래픽에도 DB 부하를 줄이고 빠른 조회를 유지하는 방법은?
 ### - [MSA로 전환할때 기존의 글로벌 Redis를 활용한 세션 방식의 로그인을 그대로 가져가도 좋을까?](https://destiny-nylon-d49.notion.site/MSA-Redis-110c20cd297280629519f18ea906d84e?pvs=4)
