@@ -31,7 +31,7 @@ public class DummyShopDataGenerator implements CommandLineRunner {
     private static final double MIN_LNG = 126.8;
     private static final double MAX_LNG = 127.2;
 
-    private static final int TOTAL_RECORDS = 10000;
+    private static final int TOTAL_RECORDS = 30000;
     private static final int BATCH_SIZE = 1000;
 
     // 가게 카테고리로 사용할 카테고리 이름 풀 (meta_category 테이블에 반드시 존재해야 함)
