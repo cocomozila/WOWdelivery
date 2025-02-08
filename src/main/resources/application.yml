@@ -24,7 +24,7 @@ spring:
       ddl-auto: create
 
 # JPA
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
