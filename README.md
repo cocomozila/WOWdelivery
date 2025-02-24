@@ -26,7 +26,9 @@
 - Kafka
 - Mockito
 - AWS
+- ALB, NLB
 - EC2
+- jenkins
   
 <br/>
 <br/>
