@@ -1,5 +1,5 @@
 # 와우배달
-![Image](https://github.com/user-attachments/assets/0295eec7-a0bc-4e74-94a0-86ee590fc535)  
+![대지 3](https://github.com/user-attachments/assets/43ee19c7-c677-4e55-a7bf-5a49d0f96f85)
    
 **개인 프로젝트로 전국에 있는 음식점과 소비자와 배달기사를 중개하는 RESTful API 서버 입니다.**
 - 코드 한 줄에도 이유와 목적이 있도록 작성했습니다.
