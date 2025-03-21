@@ -36,7 +36,7 @@
   
 # 프로젝트 전체 구조
 
-![Image](https://github.com/user-attachments/assets/546cccc6-5ff9-41ea-b0d0-ecf91bb3efb1)
+![Image](https://github.com/user-attachments/assets/d5d11e70-87e9-4558-8089-666bdade7bac)
 
 ## AWS 아키텍처 설계 개요 및 개선 방안
 
